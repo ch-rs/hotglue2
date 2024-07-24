@@ -34,8 +34,8 @@ $.glue.canvas = function()
 				max_y = $(window).height();
 			}
 			// resize body
-			$('body').css('width', max_x+'px');
-			$('body').css('height', max_y+'px');
+			//$('body').css('width', max_x+'px');
+			//$('body').css('height', max_y+'px');
 			// update grid
 			$.glue.grid.update();
 		}
@@ -321,8 +321,8 @@ $.glue.contextmenu = function()
 			// position items
 			for (var i=0; i < 2; i++) {
 				var target;
-				var cur_left = $(obj).position().left;
-				var cur_top = $(obj).position().top;
+				var cur_left = $(obj).offset().left;
+				var cur_top = $(obj).offset().top;
 				var offset = 48; // menu offset (when can't calculate height or width)
 				if (i == 0) {
 					target = top;
@@ -418,6 +418,48 @@ $.glue.contextmenu = function()
 		}
 	};
 }();
+
+$.glue.container = function () {
+  var guides = [];
+  var lines = [];
+  
+  // Defaults
+  var width = 960;
+  var mode = 0;
+
+  var draw = function () {
+    
+  }
+  
+  var clear_container_guides = function () {
+    
+  }
+  
+  return {
+    mode: function (val) {
+      if (val === undefined) {
+        return mode;
+      } else {
+        container_mode = val;
+        // call update() to redraw
+      }
+    },
+    update: function (force) {
+      if (force !== undefined && force) {
+        width = false;
+      }
+      draw();
+    },
+    width: function (val) {
+      if (val === undefined) {
+        return container_width;
+      } else {
+        container_width = val;
+        // call update() to redraw
+      }
+    }
+  }
+}
 
 $.glue.grid = function()
 {
@@ -707,6 +749,7 @@ $.glue.menu = function()
 			if (y === undefined) {
 				y = $(window).height()/2;
 			}
+						
 			var max_w = 0;
 			var max_h = 0;
 			cur = m[menu];
@@ -727,6 +770,7 @@ $.glue.menu = function()
 				$('body').append(elem);
 				// trigger event
 				$(elem).trigger('glue-menu-activate');
+				
 				// check if we still want to show the icon ;)
 				if ($(elem).css('display') == 'none') {
 					continue;
