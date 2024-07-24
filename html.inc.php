@@ -230,6 +230,12 @@ function elem_finalize($elem)
 	}
 	$ret .= '>';
 	
+	// if the tag is body, add the container wrapper div element
+    if ($elem['tag'] == 'body') {
+        $ret .= "\n";
+        $ret .= '<div class="container">';
+    }
+	
 	// make block elements have a newline after the opening tag
 	$block_tags = array('blockquote', 'body', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hr', 'li', 'ol', 'p', 'pre', 'script', 'ul');
 	if (in_array($elem['tag'], $block_tags)) {
@@ -275,6 +281,11 @@ function elem_finalize($elem)
 		$ret .= tab().$content.nl();
 	} elseif (0 < strlen($content)) {
 		$ret .= $content;
+	}
+	
+	// Close the container div element if the tag is body
+	if ($elem['tag'] == 'body') {
+	    $ret .= '</div>';
 	}
 	
 	$ret .= '</'.$elem['tag'].'>';
@@ -464,6 +475,20 @@ function html_add_js($url, $prio = 5)
 	$html['header']['js'][] = array('url'=>$url, 'prio'=>$prio);
 }
 
+/**
+ *	add data attributes to the html header
+ *
+ *	duplicate references will be removed from the output.
+ *	@param string $attribute attribut name, minus the "data-" prefix
+*	@param string $value value
+ */
+function html_add_data($attribute, $value) {
+    global $html;
+    if (!@is_array($html['header']['data'])) {
+        $html['header']['data'] = array();
+    }
+    $html['header']['data'][$attribute] = $value;
+}
 
 /**
  *	add javascript code to the html header
@@ -586,10 +611,30 @@ function html_finalize(&$cache = false)
 		$ret = substr($ret, 0, -1);
 		$ret .= '"';
 	}
+		
+	// Add data attributes if set
+	if (@is_array($html['header']['data'])) {
+	    foreach ($html['header']['data'] as $key => $val) {
+            $ret .= ' data-'.htmlspecialchars($key, ENT_COMPAT, 'UTF-8').'="'.htmlspecialchars($val, ENT_COMPAT, 'UTF-8').'"';
+        }
+    }
+	
 	$ret .= '>'.nl();
 	$ret .= '<head>'.nl();
 	$ret .= '<title>'.htmlspecialchars($html['header']['title'], ENT_NOQUOTES, 'UTF-8').'</title>'.nl();
 	$ret .= '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">'.nl();
+	$ret .= '<meta name="viewport" content="width=device-width, user-scalable=0, initial-scale=1.0">'.nl();
+
+	$ret .= '<script>
+		const addSize = () => document.documentElement.style.setProperty("--vw", window.outerWidth);
+
+		let cancel;
+		window.onresize = function(){
+			clearTimeout(cancel);
+			cancel = setTimeout(addSize, 100);
+		};
+	</script>'.nl();
+
 	if (@is_array($html['header']['alternate'])) {
 		foreach ($html['header']['alternate'] as $e) {
 			$ret .= '<link rel="alternate" type="'.htmlspecialchars($e['type'], ENT_COMPAT, 'UTF-8').'" href="'.htmlspecialchars($e['url'], ENT_COMPAT, 'UTF-8').'" title="'.htmlspecialchars($e['title'], ENT_COMPAT, 'UTF-8').'">'.nl();
@@ -690,6 +735,7 @@ function html_finalize(&$cache = false)
 		body_append($user_body);
 	}
 	$ret .= elem_finalize($html['body']);
+	$ret .= '<script>addSize();</script>'.nl();
 	$ret .= '</html>';
 	
 	// pass caching information up if requested
