@@ -624,17 +624,7 @@ function html_finalize(&$cache = false)
 	$ret .= '<title>'.htmlspecialchars($html['header']['title'], ENT_NOQUOTES, 'UTF-8').'</title>'.nl();
 	$ret .= '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">'.nl();
 	$ret .= '<meta name="viewport" content="width=device-width, user-scalable=0, initial-scale=1.0">'.nl();
-
-	$ret .= '<script>
-		const addSize = () => document.documentElement.style.setProperty("--vw", window.outerWidth);
-
-		let cancel;
-		window.onresize = function(){
-			clearTimeout(cancel);
-			cancel = setTimeout(addSize, 100);
-		};
-	</script>'.nl();
-
+	
 	if (@is_array($html['header']['alternate'])) {
 		foreach ($html['header']['alternate'] as $e) {
 			$ret .= '<link rel="alternate" type="'.htmlspecialchars($e['type'], ENT_COMPAT, 'UTF-8').'" href="'.htmlspecialchars($e['url'], ENT_COMPAT, 'UTF-8').'" title="'.htmlspecialchars($e['title'], ENT_COMPAT, 'UTF-8').'">'.nl();
@@ -735,7 +725,6 @@ function html_finalize(&$cache = false)
 		body_append($user_body);
 	}
 	$ret .= elem_finalize($html['body']);
-	$ret .= '<script>addSize();</script>'.nl();
 	$ret .= '</html>';
 	
 	// pass caching information up if requested

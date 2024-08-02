@@ -14,35 +14,3 @@ a, a:link, a:visited, a:active, a:hover {
 	color: inherit;
 	text-decoration: inherit;
 }
-
-.container {
-    pointer-events: none;
-}
-
-.container > * {
-    pointer-events: auto;
-}
-
-html[data-responsive-mode="fluid-container"] .container,
-html[data-responsive-mode="fluid-tiles"] .container,
-html[data-responsive-mode="fluid-left-container"] .container {
-    max-width: calc(var(--container-width) * 1px);
-    width: 100%;
-    height: 100vh;
-    position: relative;
-}
-
-html[data-responsive-mode="fluid-container"] .container,
-html[data-responsive-mode="fluid-left-container"] .container {
-    container-type: normal;
-}
-
-html[data-responsive-mode="fluid-container"] .container {
-    margin: auto;
-}
-
-html[data-responsive-mode="fluid-container"] body,
-html[data-responsive-mode="fluid-tiles"] body,
-html[data-responsive-mode="fluid-left-container"] body {
-    zoom: clamp(0.5, calc(var(--vw) / var(--container-width)), 1);
-}

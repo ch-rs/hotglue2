@@ -177,18 +177,6 @@ function page_render_page_early($args)
 		}
 		html_add_js_var('$.glue.conf.page.guides_y', $guide);
 	}
-	
-	// set reponsive mode
-	load_modules('glue');
-    $obj = load_object(array('name'=>$args['page'].'.page'));
-    
-    if (isset($obj['#data']['page-responsive-mode'])) {
-        html_add_data('responsive-mode', $obj['#data']['page-responsive-mode']);
-    }
-    
-    if (isset($obj['#data']['page-container-width'])) {
-        html_css('--container-width', $obj['#data']['page-container-width']);
-    }
 
 	// set the html title to the page name by default
 	html_title(page_short($args['page']));
@@ -247,7 +235,6 @@ function page_set_grid($args)
 
 register_service('page.set_grid', 'page_set_grid', array('auth'=>true));
 
-
 function page_upload($args)
 {
 	// only handle the file if the frontend wants us to
@@ -286,86 +273,3 @@ function page_upload($args)
 		return true;
 	}
 }
-
-/**
- *	set the current container width for the page
- *
- *	@param array $args arguments
- *		key 'width' is the container width
- *	@return array response
- *		true if successful
- */
-function page_set_container_width($args) {
-    if (!isset($args['width'])) {
-        return response('Required argument "mode" missing', 400);
-    }
-    
-    if (!isset($args['page'])) {
-        return response('Required argument "page" missing', 400);
-    }
-    
-    load_modules('glue');
-    $obj = load_object(array('name'=>$args['page'].'.page'));
-	if ($obj['#error']) {
-		// page object does not exist, hence no responsive mode to set
-		return response(true);
-	} else {
-		$obj = $obj['#data'];
-	}
-	
-	$obj['page-container-width'] = $args['width'];
-	
-	$ret = update_object($obj);
-	if ($ret['#error']) {
-        log_msg('page_set_container_width: error updating page object: '.quot($ret['#data']));
-        return false;
-    } else {
-        // we don't actually render the object here, but signal the 
-        // frontend that everything went okay
-        return true;
-    }
-}
-
-register_service('page.set_container_width', 'page_set_container_width', array('auth'=>true));
-
-/**
- *	set the current responsive mode for the page
- *
- *	@param array $args arguments
- *		key 'mode' is the new mode
- *	@return array response
- *		true if successful
- */
-function page_set_responsive_mode($args) {
-    if (!isset($args['mode'])) {
-        return response('Required argument "mode" missing', 400);
-    }
-    
-    if (!isset($args['page'])) {
-        return response('Required argument "page" missing', 400);
-    }
-    
-    load_modules('glue');
-    $obj = load_object(array('name'=>$args['page'].'.page'));
-	if ($obj['#error']) {
-		// page object does not exist, hence no responsive mode to set
-		return response(true);
-	} else {
-		$obj = $obj['#data'];
-	}
-
-    $obj['page-responsive-mode'] = $args['mode'];
-    
-    // update page object
-    $ret = update_object($obj);
-    if ($ret['#error']) {
-        log_msg('page_set_responsive_mode: error updating page object: '.quot($ret['#data']));
-        return false;
-    } else {
-        // we don't actually render the object here, but signal the 
-        // frontend that everything went okay
-        return true;
-    }
-}
-
-register_service('page.set_responsive_mode', 'page_set_responsive_mode', array('auth'=>true));
