@@ -61,7 +61,12 @@ error_reporting(E_ALL & ~E_STRICT);						// see php documentation
 @define('TEXT_AUTO_BR', true);				// automatically add <br> elements for newlines
 @define('TEXT_USE_WOFF_FONTS', true);		// (experimental) offer woff webfonts (supported by Firefox 3.6+, Chrome 5.0+, Internet Explorer 9)
 @define('VIDEO_START_ON_CLICK', true);		// start video on click when autoplay is off
-@define('VIEW_NEEDS_AUTH', false);			// viewing pages requires authentication
+@define('VIEW_NEEDS_AUTH', false);			
+
+@define ('STATIC_DIR', 'static'); // directory for built HTML website with module_build.inc.php
+@define('STATIC_UPLOAD_DIR', '/uploads'); // directory for static file uploads inside STATIC_DIR
+
+// viewing pages requires authentication
 
 /**
  * use this function to determine if we should serve HTTPS URLs
@@ -94,6 +99,9 @@ function base_url()
 	$temp = BASE_URL;
 	if (!empty($temp)) {
 		return $temp;
+	}
+	if (isset($base_url_cached)) {
+        return $base_url_cached;
 	} elseif (!isset($base_url_cached)) {
 		if (!is_base_url_secure()) {
 			$base_url_cached = 'http://'.$_SERVER['HTTP_HOST'];

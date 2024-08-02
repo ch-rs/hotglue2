@@ -790,9 +790,12 @@ function render_object($args)
 	} else {
 		$args['edit'] = false;
 	}
+	if (!isset($args['build'])) {
+		$args['build'] = false;
+	}
 	
 	log_msg('debug', 'render_object: rendering '.quot($args['name']));
-	$ret = invoke_hook_while('render_object', false, array('obj'=>$obj, 'edit'=>$args['edit']));
+	$ret = invoke_hook_while('render_object', false, array('obj'=>$obj, 'edit'=>$args['edit'], 'build'=>$args['build']));
 	if (empty($ret)) {
 		log_msg('warn', 'render_object: nobody claimed '.quot($obj['name']));
 		return response('');
@@ -801,7 +804,7 @@ function render_object($args)
 		log_msg('debug', 'render_object: '.quot($obj['name']).' was handled by '.quot($temp[0]));
 		$temp = array_values($ret);
 		// make sure object has a tailing newline
-		if (0 < strlen($temp[0]) && substr($temp[0], -1) != "\n") {
+		if ($temp[0] && 0 < strlen($temp[0]) && substr($temp[0], -1) != "\n") {
 			$temp[0] .= nl();
 		}
 		body_append($temp[0]);
@@ -838,6 +841,9 @@ function render_page($args)
 	if (!isset($args['edit'])) {
 		return response('Required argument "edit" missing', 400);
 	}
+	if (!isset($args['build'])) {
+		$args['build'] = false;
+	}
 	if ($args['edit']) {
 		$args['edit'] = true;
 	} else {
@@ -848,7 +854,7 @@ function render_page($args)
 	$bdy = &body();
 	elem_add_class($bdy, 'page');
 	elem_attr($bdy, 'id', $args['page']);
-	invoke_hook('render_page_early', array('page'=>$args['page'], 'edit'=>$args['edit']));
+	invoke_hook('render_page_early', array('page'=>$args['page'], 'edit'=>$args['edit'], 'build'=>$args['build']));
 	
 	// for every file in the page directory
 	$files = @scandir(CONTENT_DIR.'/'.str_replace('.', '/', $args['page']));
@@ -866,10 +872,10 @@ function render_page($args)
 			continue;
 		}
 		// render object
-		render_object(array('name'=>$args['page'].'.'.$f, 'edit'=>$args['edit']));
+		render_object(array('name'=>$args['page'].'.'.$f, 'edit'=>$args['edit'], 'build'=>$args['build']));
 	}
 	
-	invoke_hook('render_page_late', array('page'=>$args['page'], 'edit'=>$args['edit']));
+	invoke_hook('render_page_late', array('page'=>$args['page'], 'edit'=>$args['edit'], 'build'=>$args['build']));
 	log_msg('debug', 'render_page: finished '.quot($args['page']));
 	
 	// return the body element as html-string as well

@@ -44,9 +44,10 @@ switch ($_SERVER['REQUEST_METHOD']) {
 	//	break;
 	case 'POST':
 		foreach ($_POST as $key=>$val) {
-            if ($key !== "html") {
+            if ($key !== "html" && $key !== "content") {
                 $val = stripslashes($val);
             }
+            
 			$dec = @json_decode($val, true);
 			if ($dec === NULL) {
 				$err = response('Error decoding the argument '.quot($key).' => '.var_dump_inl($val), 400);
