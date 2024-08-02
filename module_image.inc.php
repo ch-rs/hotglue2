@@ -91,10 +91,18 @@ function image_alter_render_early($args)
 	// filename in the shared directory (the file eventually gets served 
 	// in image_serve_resource())
 	// TODO (later): support URLs as well
-	if (SHORT_URLS) {
-		$url = base_url().urlencode($obj['name']);
+
+	if (!empty($obj['image-file']) && isset($args['build']) && $args['build']) {
+		$a = explode('.', $obj['name']);
+		$image_to_use = isset($obj['image-resized-file']) ? $obj['image-resized-file'] : $obj['image-file'];
+		// Include page name as subdir
+		$url = STATIC_UPLOAD_DIR.'/'. $a[0] .'/'. $image_to_use;
 	} else {
-		$url = base_url().'?'.urlencode($obj['name']);
+		if (SHORT_URLS) {
+			$url = base_url().urlencode($obj['name']);
+		} else {
+			$url = base_url().'?'.urlencode($obj['name']);
+		}
 	}
 	
 	// render a div with background if we have original-{width,height}
@@ -121,6 +129,11 @@ function image_alter_render_early($args)
 			} else {
 				elem_attr($i, 'alt', '');
 			}
+
+			elem_attr($i, 'width', preg_replace("/[^0-9]/", "", $obj['object-width']));
+			elem_attr($i, 'height', preg_replace("/[^0-9]/", "", $obj['object-height']));
+			elem_attr($i, 'loading', 'lazy');
+
 			elem_css($i, 'width', '100%');
 			elem_css($i, 'height', '100%');
 			elem_css($i, 'padding', '0px');
@@ -286,11 +299,11 @@ function image_render_object($args)
 	// elem is passed as reference here
 	// it is suggested that we first call our own function before any others 
 	// that might want to modify the element that is being set up
-	invoke_hook_first('alter_render_early', 'image', array('obj'=>$obj, 'elem'=>&$e, 'edit'=>$args['edit']));
+	invoke_hook_first('alter_render_early', 'image', array('obj'=>$obj, 'elem'=>&$e, 'edit'=>$args['edit'], 'build'=>$args['build']));
 	$html = elem_finalize($e);
 	// html is passed as reference here
 	// it is suggested that we call our own function after all others
-	invoke_hook_last('alter_render_late', 'image', array('obj'=>$obj, 'html'=>&$html, 'elem'=>$e, 'edit'=>$args['edit']));
+	invoke_hook_last('alter_render_late', 'image', array('obj'=>$obj, 'html'=>&$html, 'elem'=>$e, 'edit'=>$args['edit'], 'build'=>$args['build']));
 	
 	return $html;
 }
