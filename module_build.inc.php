@@ -15,6 +15,20 @@ require_once('controller.inc.php');
 require_once('html.inc.php');
 require_once('modules.inc.php');
 
+function build_render_page_early($args)
+{
+	if ($args['edit']) {
+		if (USE_MIN_FILES) {
+			html_add_js(base_url().'modules/build/build-edit.min.js');
+		} else {
+			html_add_js(base_url().'modules/build/build-edit.js');
+		}
+		//html_add_css(base_url().'modules/build/build-edit.css');
+	}
+	
+	//html_add_css(base_url().'modules/build/build.css');
+}
+
 function get_single_page_html ($page_name) {
 	global $base_url_cached;
 	$base_url_cached = '/';
@@ -121,9 +135,9 @@ function controller_builder($args)
 
 	// If referrer exists, redirect back to it, otherwise redirect to $page
 	if (isset($_SERVER['HTTP_REFERER'])) {
-        //header('Location: ' . $_SERVER['HTTP_REFERER']);
+        header('Location: ' . $_SERVER['HTTP_REFERER']);
     } else {
-        //header('Location: ' . str_replace('/build', '/edit', $_SERVER['REQUEST_URI']));
+        header('Location: ' . str_replace('/build', '/edit', $_SERVER['REQUEST_URI']));
     }
 }
 
