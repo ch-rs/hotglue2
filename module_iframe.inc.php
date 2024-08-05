@@ -20,14 +20,13 @@ require_once('modules.inc.php');
 // (they can be easier than that one though)
 
 
-function iframe_alter_save($args)
-{
+function iframe_alter_save($args) {
 	$elem = $args['elem'];
 	$obj = &$args['obj'];
 	if (!elem_has_class($elem, 'iframe')) {
 		return false;
 	}
-	
+
 	// parse children elements to find iframe
 	$childs = html_parse(elem_val($elem));
 	$i = false;
@@ -38,13 +37,13 @@ function iframe_alter_save($args)
 		}
 	}
 	if (!$i) {
-		log_msg('warn', 'iframe_alter_save: no iframe element found, inner html is '.var_dump_inl($childs));
+		log_msg('warn', 'iframe_alter_save: no iframe element found, inner html is ' . var_dump_inl($childs));
 		return false;
 	}
-	
+
 	// url
 	if (elem_attr($i, 'src') !== NULL) {
-    // strip schema from url
+		// strip schema from url
 		$obj['iframe-url'] = strstr(elem_attr($i, 'src'), '//');
 	} else {
 		unset($obj['iframe-url']);
@@ -55,19 +54,18 @@ function iframe_alter_save($args)
 	} else {
 		$obj['iframe-scroll'] = 'scroll';
 	}
-	
+
 	return true;
 }
 
 
-function iframe_alter_render_early($args)
-{
+function iframe_alter_render_early($args) {
 	$elem = &$args['elem'];
 	$obj = $args['obj'];
 	if (!elem_has_class($elem, 'iframe')) {
 		return false;
 	}
-	
+
 	// add iframe
 	$i = elem('iframe');
 	// frameborder is not valid html5
@@ -87,7 +85,7 @@ function iframe_alter_render_early($args)
 	elem_css($i, 'width', '100%');
 	// url
 	if (!empty($obj['iframe-url'])) {
-    // use protocol relative url
+		// use protocol relative url
 		//elem_attr($i, 'src', $obj['iframe-url']);
 		elem_attr($i, 'src', strstr($obj['iframe-url'], '//'));
 	} else {
@@ -116,65 +114,62 @@ function iframe_alter_render_early($args)
 		elem_attr($s, 'title', 'visitors will be able to interact with the webpage below');
 		elem_append($elem, $s);
 	}
-	
+
 	return true;
 }
 
 
-function iframe_render_object($args)
-{
+function iframe_render_object($args) {
 	$obj = $args['obj'];
 	if (!isset($obj['type']) || $obj['type'] != 'iframe') {
 		return false;
 	}
-	
+
 	$e = elem('div');
 	elem_attr($e, 'id', $obj['name']);
 	elem_add_class($e, 'iframe');
 	elem_add_class($e, 'resizable');
 	elem_add_class($e, 'object');
-	
+
 	// hooks
-	invoke_hook_first('alter_render_early', 'iframe', array('obj'=>$obj, 'elem'=>&$e, 'edit'=>$args['edit']));
+	invoke_hook_first('alter_render_early', 'iframe', array('obj' => $obj, 'elem' => &$e, 'edit' => $args['edit']));
 	$html = elem_finalize($e);
-	invoke_hook_last('alter_render_late', 'iframe', array('obj'=>$obj, 'html'=>&$html, 'elem'=>$e, 'edit'=>$args['edit']));
-	
+	invoke_hook_last('alter_render_late', 'iframe', array('obj' => $obj, 'html' => &$html, 'elem' => $e, 'edit' => $args['edit']));
+
 	return $html;
 }
 
 
-function iframe_render_page_early($args)
-{
+function iframe_render_page_early($args) {
 	if ($args['edit']) {
 		if (USE_MIN_FILES) {
-			html_add_js(base_url().'modules/iframe/iframe-edit.min.js');
+			html_add_js(base_url() . 'modules/iframe/iframe-edit.min.js');
 		} else {
-			html_add_js(base_url().'modules/iframe/iframe-edit.js');
+			html_add_js(base_url() . 'modules/iframe/iframe-edit.js');
 		}
-		html_add_css(base_url().'modules/iframe/iframe-edit.css');
+		html_add_css(base_url() . 'modules/iframe/iframe-edit.css');
 	}
 }
 
 
-function iframe_save_state($args)
-{
+function iframe_save_state($args) {
 	$elem = $args['elem'];
 	$obj = $args['obj'];
 	if (get_first_item(elem_classes($elem)) != 'iframe') {
 		return false;
 	}
-	
+
 	// make sure the type is set
 	$obj['type'] = 'iframe';
 	$obj['module'] = 'iframe';
-	
+
 	// hook
-	invoke_hook('alter_save', array('obj'=>&$obj, 'elem'=>$elem));
-	
+	invoke_hook('alter_save', array('obj' => &$obj, 'elem' => $elem));
+
 	load_modules('glue');
 	$ret = save_object($obj);
 	if ($ret['#error']) {
-		log_msg('error', 'iframe_save_state: save_object returned '.quot($ret['#data']));
+		log_msg('error', 'iframe_save_state: save_object returned ' . quot($ret['#data']));
 		return false;
 	} else {
 		return true;

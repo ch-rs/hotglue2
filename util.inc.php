@@ -15,29 +15,28 @@
  *	@param array $container container array
  *	@return string
  */
-function array_to_js($container)
-{
-	$ret = '<script type="text/javascript">'.nl();
+function array_to_js($container) {
+	$ret = '<script type="text/javascript">' . nl();
 	// sort container by keys
 	ksort($container);
 	$exists = array();
-	foreach ($container as $key=>$val) {
+	foreach ($container as $key => $val) {
 		// make sure the keys exist
 		$objs = expl('.', $key);
-		for ($i=0; $i < count($objs)-1; $i++) {
-			$obj = implode('.', array_slice($objs, 0, $i+1));
+		for ($i = 0; $i < count($objs) - 1; $i++) {
+			$obj = implode('.', array_slice($objs, 0, $i + 1));
 			if (!in_array($obj, $exists)) {
 				if ($i == 0) {
-					$ret .= tab().'var '.$obj.' = '.$obj.' || {};'.nl();
+					$ret .= tab() . 'var ' . $obj . ' = ' . $obj . ' || {};' . nl();
 				} else {
-					$ret .= tab().$obj.' = '.$obj.' || {};'.nl();
+					$ret .= tab() . $obj . ' = ' . $obj . ' || {};' . nl();
 				}
 				$exists[] = $obj;
 			}
 		}
-		$ret .= tab().''.$key.' = '.json_encode($val).';'.nl();
+		$ret .= tab() . '' . $key . ' = ' . json_encode($val) . ';' . nl();
 	}
-	$ret .= '</script>'.nl();
+	$ret .= '</script>' . nl();
 	return $ret;
 }
 
@@ -48,12 +47,11 @@ function array_to_js($container)
  *	@param array &$a reference to array
  *	@param mixed $key key whose value we compare
  */
-function array_unique_element(&$a, $key)
-{
+function array_unique_element(&$a, $key) {
 	// for each row
-	for ($cur=0; $cur < count($a); $cur++) {
+	for ($cur = 0; $cur < count($a); $cur++) {
 		// look in every row further down
-		for ($i=$cur+1; $i < count($a); $i++) {
+		for ($i = $cur + 1; $i < count($a); $i++) {
 			// to see if the value of a key in the array is the same as in the 
 			// current row
 			if ($a[$i][$key] == $a[$cur][$key]) {
@@ -75,8 +73,7 @@ function array_unique_element(&$a, $key)
  *	@return (basename) filename of identical file in $dir or false if 
  *	there is none
  */
-function dir_has_same_file($dir, $fn, $orig_fn = '')
-{
+function dir_has_same_file($dir, $fn, $orig_fn = '') {
 	// strip any slash at the end of $dir
 	if (substr($dir, -1) == '/') {
 		$dir = substr($dir, 0, -1);
@@ -86,7 +83,7 @@ function dir_has_same_file($dir, $fn, $orig_fn = '')
 	} else {
 		$orig_fn = basename($orig_fn);
 	}
-	
+
 	if (($dir_fns = @scandir($dir)) === false) {
 		return false;
 	}
@@ -99,7 +96,7 @@ function dir_has_same_file($dir, $fn, $orig_fn = '')
 		if ($f == '.' || $f == '..') {
 			continue;
 		}
-		if (!file_is_different($fn, $dir.'/'.$f)) {
+		if (!file_is_different($fn, $dir . '/' . $f)) {
 			return $f;
 		}
 	}
@@ -114,36 +111,35 @@ function dir_has_same_file($dir, $fn, $orig_fn = '')
  *	@param string $b filename
  *	@return bool
  */
-function dir_is_different($a, $b)
-{
+function dir_is_different($a, $b) {
 	if (substr($a, -1) == '/') {
 		$a = substr($a, 0, -1);
 	}
 	if (substr($b, -1) == '/') {
 		$b = substr($b, 0, -1);
 	}
-	
+
 	$a_fns = @scandir($a);
 	$b_fns = @scandir($b);
 	if ($a_fns !== $b_fns) {
 		return true;
 	}
-	
+
 	foreach ($a_fns as $fn) {
 		if ($fn == '.' || $fn == '..') {
 			continue;
 		}
-		if (is_dir($a.'/'.$fn) || is_dir($b.'/'.$fn)) {
-			if (dir_is_different($a.'/'.$fn, $b.'/'.$fn)) {
+		if (is_dir($a . '/' . $fn) || is_dir($b . '/' . $fn)) {
+			if (dir_is_different($a . '/' . $fn, $b . '/' . $fn)) {
 				return true;
 			}
 		} else {
-			if (file_is_different($a.'/'.$fn, $b.'/'.$fn)) {
+			if (file_is_different($a . '/' . $fn, $b . '/' . $fn)) {
 				return true;
 			}
 		}
 	}
-	
+
 	return false;
 }
 
@@ -156,8 +152,7 @@ function dir_is_different($a, $b)
  *	@param string $string input string
  *	@return array
  */
-function expl($delimiter, $string)
-{
+function expl($delimiter, $string) {
 	$ret = explode($delimiter, $string);
 	if (count($ret) == 1 && empty($ret[0])) {
 		return array();
@@ -174,8 +169,7 @@ function expl($delimiter, $string)
  *	@param bool $honor_quot don't split inside quotation marks
  *	@return array of strings
  */
-function expl_whitesp($s, $honor_quot = false)
-{
+function expl_whitesp($s, $honor_quot = false) {
 	// same characters as trim() uses
 	$whitesp = array(' ', "\t", "\n", "\r", "\0", "\x0B");
 	$quot = array('"', "'");
@@ -183,13 +177,13 @@ function expl_whitesp($s, $honor_quot = false)
 
 	$prev = -1;
 	$cur_quot = false;
-	
-	for ($i=0; $i < strlen($s); $i++) {
+
+	for ($i = 0; $i < strlen($s); $i++) {
 		if ($honor_quot && in_array($s[$i], $quot)) {
 			if ($cur_quot === false) {
 				// begin of quote
 				$cur_quot = $s[$i];
-			} elseif ($cur_quot == $s[$i] && ($i < 1 || $s[$i-1] != "\\")) {
+			} elseif ($cur_quot == $s[$i] && ($i < 1 || $s[$i - 1] != "\\")) {
 				// end of quote
 				$cur_quot = false;
 			}
@@ -199,18 +193,18 @@ function expl_whitesp($s, $honor_quot = false)
 			continue;
 		}
 		if (in_array($s[$i], $whitesp)) {
-			if ($prev+1 == $i) {
+			if ($prev + 1 == $i) {
 				$prev++;
 			} else {
-				$ret[] = substr($s, $prev+1, $i-$prev-1);
+				$ret[] = substr($s, $prev + 1, $i - $prev - 1);
 				$prev = $i;
 			}
 		}
 	}
-	if ($prev+2 < $i) {
-		$ret[] = substr($s, $prev+1);
+	if ($prev + 2 < $i) {
+		$ret[] = substr($s, $prev + 1);
 	}
-	
+
 	return $ret;
 }
 
@@ -222,8 +216,7 @@ function expl_whitesp($s, $honor_quot = false)
  *	@param string $b filename
  *	@return bool
  */
-function file_is_different($a, $b)
-{
+function file_is_different($a, $b) {
 	if (@filesize($a) !== @filesize($b)) {
 		return true;
 	}
@@ -241,11 +234,10 @@ function file_is_different($a, $b)
  *	@param string $s filename
  *	@return string
  */
-function filext($s)
-{
+function filext($s) {
 	$a = expl('.', $s);
 	if (1 < count($a)) {
-		return(array_pop($a));
+		return (array_pop($a));
 	} else {
 		return '';
 	}
@@ -258,8 +250,7 @@ function filext($s)
  *	@param Traversable|array $iterable the array where to pick the first value
  *	@return mixed
  */
-function get_first_item($iterable)
-{
+function get_first_item($iterable) {
 	if (!is_iterable($iterable)) {
 		throw new InvalidArgumentException("Argument isn't iterable.");
 	}
@@ -280,8 +271,7 @@ function get_first_item($iterable)
  *	@return bool true if successful (only if $header_only is true), false 
  *	if not
  */
-function http_error($code, $header_only = false)
-{
+function http_error($code, $header_only = false) {
 	switch ($code) {
 		case 400:
 			$error = 'Bad Request';
@@ -296,7 +286,7 @@ function http_error($code, $header_only = false)
 			// unsupported
 			return false;
 	}
-	header($_SERVER['SERVER_PROTOCOL'].' '.$code.' '.$error);
+	header($_SERVER['SERVER_PROTOCOL'] . ' ' . $code . ' ' . $error);
 	if (!$header_only) {
 		echo $error;
 		die();
@@ -318,15 +308,14 @@ function http_error($code, $header_only = false)
  *	@retval -3 unknown username
  *	@retval -4 invalid password
  */
-function http_digest_check($users, $realm = '')
-{
+function http_digest_check($users, $realm = '') {
 	// code based on the php documentation
 	if (empty($_SERVER['PHP_AUTH_DIGEST'])) {
 		return -1;
 	} else {
 		$auth = $_SERVER['PHP_AUTH_DIGEST'];
 	}
-	
+
 	// taken from one of the comments
 	$data = array();
 	preg_match("/username=\"([^\"]+)\"/i", $auth, $match);
@@ -373,17 +362,17 @@ function http_digest_check($users, $realm = '')
 	} else {
 		return -2;
 	}
-	
+
 	// check username
 	if (!array_key_exists($data['username'], $users)) {
 		return -3;
 	}
-	
+
 	// generate the valid response
-	$a1 = md5($data['username'].':'.str_replace("\"", '', $realm).':'.$users[$data['username']]);
-	$a2 = md5($_SERVER['REQUEST_METHOD'].':'.$data['uri']);
-	$valid_response = md5($a1.':'.$data['nonce'].':'.$data['nc'].':'.$data['cnonce'].':'.$data['qop'].':'.$a2);
-	
+	$a1 = md5($data['username'] . ':' . str_replace("\"", '', $realm) . ':' . $users[$data['username']]);
+	$a2 = md5($_SERVER['REQUEST_METHOD'] . ':' . $data['uri']);
+	$valid_response = md5($a1 . ':' . $data['nonce'] . ':' . $data['nc'] . ':' . $data['cnonce'] . ':' . $data['qop'] . ':' . $a2);
+
 	if ($data['response'] != $valid_response) {
 		return -4;
 	} else {
@@ -398,11 +387,10 @@ function http_digest_check($users, $realm = '')
  *	make sure the script stops execution after calling this function.
  *	@param string $realm realm (e.g. name of the site)
  */
-function http_digest_prompt($realm = '')
-{
+function http_digest_prompt($realm = '') {
 	// code based on the php documentation
-	header($_SERVER['SERVER_PROTOCOL'].' 401 Unauthorized');
-	header('WWW-Authenticate: Digest realm="'.str_replace("\"", '', $realm).'",qop="auth",nonce="'.uniqid().'",opaque="'.md5(str_replace("\"", '', $realm)).'"');
+	header($_SERVER['SERVER_PROTOCOL'] . ' 401 Unauthorized');
+	header('WWW-Authenticate: Digest realm="' . str_replace("\"", '', $realm) . '",qop="auth",nonce="' . uniqid() . '",opaque="' . md5(str_replace("\"", '', $realm)) . '"');
 }
 
 
@@ -412,8 +400,7 @@ function http_digest_prompt($realm = '')
  *	@param string $s
  *	@return bool
  */
-function is_url($s)
-{
+function is_url($s) {
 	if (strpos($s, '://') || strtolower(substr($s, 0, 7)) == 'mailto:') {
 		return true;
 	} else {
@@ -421,16 +408,14 @@ function is_url($s)
 	}
 }
 
-if (!function_exists('is_iterable'))
-{
+if (!function_exists('is_iterable')) {
 	/**
 	 * determine if a variable is iterable (already implemented in PHP 7.1+)
 	 *
 	 * @param mixed $var the variable to check
 	 * @return bool
 	 */
-	function is_iterable($var)
-	{
+	function is_iterable($var) {
 		return is_array($var) || $var instanceof Traversable;
 	}
 }
@@ -442,8 +427,7 @@ if (!function_exists('is_iterable'))
  *	@param int $count count (one is default)
  *	@return string
  */
-function nl($count = 1)
-{
+function nl($count = 1) {
 	$s = '';
 	while (0 < $count--) {
 		$s .= "\n";
@@ -460,9 +444,8 @@ function nl($count = 1)
  *	@param string $chr character to pad the string with
  *	@return string
  */
-function pad($s, $num, $chr = ' ')
-{
-	for ($i=strlen($s); $i < $num; $i++) {
+function pad($s, $num, $chr = ' ') {
+	for ($i = strlen($s); $i < $num; $i++) {
 		$s .= $chr;
 	}
 	return $s;
@@ -475,9 +458,8 @@ function pad($s, $num, $chr = ' ')
  *	@param string $s string
  *	@return string
  */
-function quot($s)
-{
-	return '"'.$s.'"';
+function quot($s) {
+	return '"' . $s . '"';
 }
 
 
@@ -487,8 +469,7 @@ function quot($s)
  *	@param string $f file name
  *	@return true if successful, false if not
  */
-function rm_recursive($f)
-{
+function rm_recursive($f) {
 	if (@is_file($f) || @is_link($f)) {
 		// note: symlinks get deleted right away, and not recursed into
 		return @unlink($f);
@@ -504,7 +485,7 @@ function rm_recursive($f)
 			if ($child == '.' || $child == '..') {
 				continue;
 			} else {
-				rm_recursive($f.'/'.$child);
+				rm_recursive($f . '/' . $child);
 			}
 		}
 		return @rmdir($f);
@@ -520,8 +501,7 @@ function rm_recursive($f)
  *	@param bool $dl download file
  *	@param string $mime mime type
  */
-function serve_file($fn, $dl, $mime = '')
-{
+function serve_file($fn, $dl, $mime = '') {
 	if (($size = @filesize($fn)) === false) {
 		return false;
 	}
@@ -529,23 +509,23 @@ function serve_file($fn, $dl, $mime = '')
 		// fall back to octet-stream
 		$mime = 'application/octet-stream';
 	}
-	
+
 	// TODO (later): optionally set the mime type based on the file extension only
 	// see http://www.php.net/manual/en/function.readfile.php#52722
 	// TODO (later): handle byte range
 	// TODO (later): handle if-modified-since etc
 	// TODO (later): also check apache_request_headers()
-	
+
 	if ($dl) {
 		// these are taken from the php documentation (on readfile())
 		header('Content-Description: File Transfer');
 		header('Content-Type: application/octet-stream');
-		header('Content-Disposition: attachment; filename="'.basename($fn).'"');
+		header('Content-Disposition: attachment; filename="' . basename($fn) . '"');
 		header('Content-Transfer-Encoding: binary');
 	} else {
-		header('Content-Type: '.$mime);
+		header('Content-Type: ' . $mime);
 	}
-	header('Content-Length: '.$size);
+	header('Content-Length: ' . $size);
 	flush();
 	@readfile($fn);
 	die();
@@ -558,8 +538,7 @@ function serve_file($fn, $dl, $mime = '')
  *	@param int $count count (one is default)
  *	@return string
  */
-function tab($count = 1)
-{
+function tab($count = 1) {
 	$s = '';
 	while (0 < $count--) {
 		$s .= "\t";
@@ -575,28 +554,27 @@ function tab($count = 1)
  *	@param string $orig_fn original filename
  *	@return string (basename) proposed filename
  */
-function unique_filename($dir, $orig_fn)
-{
+function unique_filename($dir, $orig_fn) {
 	// strip any slash at the end of $dir
 	if (substr($dir, -1) == '/') {
 		$dir = substr($dir, 0, -1);
 	}
-	
+
 	$fn = basename($orig_fn);
 	$num = 1;
 	// is_link() is there to catch dangling symlinks
-	while (is_file($dir.'/'.$fn) || is_dir($dir.'/'.$fn) || is_link($dir.'/'.$fn)) {
+	while (is_file($dir . '/' . $fn) || is_dir($dir . '/' . $fn) || is_link($dir . '/' . $fn)) {
 		// find first dot and prepend _$num there
 		// TODO (later): we could handle the case where $orig_fn is already 
 		// something like foo_2.bar
 		$fn = basename($orig_fn);
 		if (($p = strpos($fn, '.')) !== false) {
-			$fn = substr($fn, 0, $p).'_'.(++$num).substr($fn, $p);
+			$fn = substr($fn, 0, $p) . '_' . (++$num) . substr($fn, $p);
 		} else {
-			$fn .= '_'.(++$num);
+			$fn .= '_' . (++$num);
 		}
 	}
-	
+
 	return $fn;
 }
 
@@ -607,8 +585,7 @@ function unique_filename($dir, $orig_fn)
  *	@param mixed $var variable
  *	@return string
  */
-function var_dump_inl($var)
-{
+function var_dump_inl($var) {
 	// print_r returns true/false as '1'/''
 	// fix this at least for the value of $var itself
 	if (is_bool($var) && $var) {
@@ -616,7 +593,7 @@ function var_dump_inl($var)
 	} elseif (is_bool($var)) {
 		return 'false';
 	}
-	
+
 	$ret = print_r($var, true);
 	// remove control characters
 	$ret = str_replace("\n", ' ', $ret);

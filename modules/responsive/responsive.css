@@ -1,9 +1,8 @@
-
 .container {
     pointer-events: none;
 }
 
-.container > * {
+.container>* {
     pointer-events: auto;
 }
 

@@ -15,13 +15,13 @@
 }
 
 #welcome-msg span#text {
-	display:block;
-	margin:5px;
+	display: block;
+	margin: 5px;
 }
 
 #welcome-msg span#cont {
-	display:block;
-	margin:15px 0 15px 5px;
+	display: block;
+	margin: 15px 0 15px 5px;
 }
 
 #welcome-first {

@@ -20,8 +20,7 @@ require_once('modules.inc.php');
 // (they can be easier than that one though)
 
 
-function lock_alter_render_early($args)
-{
+function lock_alter_render_early($args) {
 	$elem = &$args['elem'];
 	$obj = $args['obj'];
 	if (!elem_has_class($elem, 'object')) {
@@ -31,13 +30,12 @@ function lock_alter_render_early($args)
 	if (!empty($obj['object-lock'])) {
 		elem_add_class($elem, 'locked');
 	}
-	
+
 	return true;
 }
 
 
-function lock_alter_save($args)
-{
+function lock_alter_save($args) {
 	$elem = $args['elem'];
 	$obj = &$args['obj'];
 	if (!elem_has_class($elem, 'object')) {
@@ -54,34 +52,28 @@ function lock_alter_save($args)
 }
 
 
-function lock_render_object($args)
-{
+function lock_render_object($args) {
 	$elem = &$args['elem'];
 	$obj = &$args['obj'];
 	if (!elem_has_class($elem, 'object')) {
 		return false;
 	}
-	
+
 	if (!empty($obj['object-lock'])) {
 		elem_css($elem, 'object-lock', $obj['object-lock']);
 	}
-
 }
 
 
-function lock_render_page_early($args)
-{
+function lock_render_page_early($args) {
 	if ($args['edit']) {
 		if (USE_MIN_FILES) {
-			html_add_js(base_url().'modules/lock/lock.min.js');
+			html_add_js(base_url() . 'modules/lock/lock.min.js');
 		} else {
-			html_add_js(base_url().'modules/lock/lock.js');
+			html_add_js(base_url() . 'modules/lock/lock.js');
 		}
 		return true;
 	} else {
 		return false;
 	}
 }
-
-
-?>

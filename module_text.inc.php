@@ -29,10 +29,9 @@ require_once('util.inc.php');
  *	@param string $style_to_include style to include (normal, italic, bold, bolditalic) (default: include all styles)
  *	@return true if successful, false if not
  */
-function _include_woff_font($font_family, $style_to_include = '')
-{
+function _include_woff_font($font_family, $style_to_include = '') {
 	static $already_included = array();
-	
+
 	// strip quotation marks
 	// TODO (later): do proper parsing of font-family string
 	$font_family = str_replace('"', '', $font_family);
@@ -41,8 +40,8 @@ function _include_woff_font($font_family, $style_to_include = '')
 	if (!array_key_exists($font_family, $woff_fonts)) {
 		return false;
 	}
-	
-	foreach ($woff_fonts[$font_family] as $style=>$woff) {
+
+	foreach ($woff_fonts[$font_family] as $style => $woff) {
 		if (!empty($style_to_include) && $style_to_include != $style) {
 			continue;
 		}
@@ -53,19 +52,19 @@ function _include_woff_font($font_family, $style_to_include = '')
 			}
 		}
 		// TODO (later): check css encoding
-		$rule = '@font-face {'.nl();
-		$rule .= tab().'font-family: \''.$font_family.'\';'.nl();
+		$rule = '@font-face {' . nl();
+		$rule .= tab() . 'font-family: \'' . $font_family . '\';' . nl();
 		if ($style == 'italic' || $style == 'bolditalic') {
-			$rule .= tab().'font-style: italic;'.nl();
+			$rule .= tab() . 'font-style: italic;' . nl();
 		} else {
-			$rule .= tab().'font-style: normal;'.nl();
+			$rule .= tab() . 'font-style: normal;' . nl();
 		}
 		if ($style == 'bold' || $style == 'bolditalic') {
-			$rule .= tab().'font-weight: bold;'.nl();
+			$rule .= tab() . 'font-weight: bold;' . nl();
 		} else {
-			$rule .= tab().'font-weight: normal;'.nl();
+			$rule .= tab() . 'font-weight: normal;' . nl();
 		}
-		$rule .= tab().'src: url('.base_url().'img/'.$woff.') format("woff");'.nl();
+		$rule .= tab() . 'src: url(' . base_url() . 'img/' . $woff . ') format("woff");' . nl();
 		$rule .= '}';
 		html_add_css_inline($rule, 5);
 		// add to list of already included font styles
@@ -84,8 +83,7 @@ function _include_woff_font($font_family, $style_to_include = '')
  *	@param string $font_family font family
  *	@return true if there is a woff-font, false if not
  */
-function _is_woff_font($font_family)
-{
+function _is_woff_font($font_family) {
 	$woff_fonts = _woff_fonts();
 	// strip quotation marks for the comparison
 	// TODO (later): do proper parsing of font-family string
@@ -103,8 +101,7 @@ function _is_woff_font($font_family)
  *	@param string $name object name
  *	@return html-encoded content
  */
-function _text_render_content($s, $name)
-{
+function _text_render_content($s, $name) {
 	// resolve any aliases
 	$s = resolve_aliases($s, $name);
 	$s = html_encode_str_smart($s);
@@ -127,8 +124,7 @@ function _text_render_content($s, $name)
  *
  *	@return array
  */
-function _woff_fonts()
-{
+function _woff_fonts() {
 	// use a hardcoded array of woff fonts for now
 	return array(
 		'LatinModern' => array(
@@ -159,14 +155,13 @@ function _woff_fonts()
 }
 
 
-function text_alter_save($args)
-{
+function text_alter_save($args) {
 	$elem = $args['elem'];
 	$obj = &$args['obj'];
 	if (!elem_has_class($elem, 'text')) {
 		return false;
 	}
-	
+
 	// background-color
 	if (elem_css($elem, 'background-color') !== NULL) {
 		$obj['text-background-color'] = elem_css($elem, 'background-color');
@@ -257,19 +252,18 @@ function text_alter_save($args)
 	} else {
 		unset($obj['text-word-spacing']);
 	}
-	
+
 	return true;
 }
 
 
-function text_alter_render_early($args)
-{
+function text_alter_render_early($args) {
 	$elem = &$args['elem'];
 	$obj = $args['obj'];
 	if (!elem_has_class($elem, 'text')) {
 		return false;
 	}
-	
+
 	// background-color
 	if (!empty($obj['text-background-color'])) {
 		elem_css($elem, 'background-color', $obj['text-background-color']);
@@ -360,52 +354,50 @@ function text_alter_render_early($args)
 	if (!empty($obj['text-word-spacing'])) {
 		elem_css($elem, 'word-spacing', $obj['text-word-spacing']);
 	}
-	
+
 	return true;
 }
 
 
-function text_render_object($args)
-{
+function text_render_object($args) {
 	$obj = $args['obj'];
 	if (!isset($obj['type']) || $obj['type'] != 'text') {
 		return false;
 	}
-	
+
 	$e = elem('div');
 	elem_attr($e, 'id', $obj['name']);
 	elem_add_class($e, 'text');
 	elem_add_class($e, 'resizable');
 	elem_add_class($e, 'object');
-	
+
 	// hooks
-	invoke_hook_first('alter_render_early', 'text', array('obj'=>$obj, 'elem'=>&$e, 'edit'=>$args['edit']));
+	invoke_hook_first('alter_render_early', 'text', array('obj' => $obj, 'elem' => &$e, 'edit' => $args['edit']));
 	$html = elem_finalize($e);
-	invoke_hook_last('alter_render_late', 'text', array('obj'=>$obj, 'html'=>&$html, 'elem'=>$e, 'edit'=>$args['edit']));
-	
+	invoke_hook_last('alter_render_late', 'text', array('obj' => $obj, 'html' => &$html, 'elem' => $e, 'edit' => $args['edit']));
+
 	return $html;
 }
 
 
-function text_render_page_early($args)
-{
+function text_render_page_early($args) {
 	if ($args['edit']) {
 		if (USE_MIN_FILES) {
-			html_add_js(base_url().'modules/text/text-edit.min.js');
+			html_add_js(base_url() . 'modules/text/text-edit.min.js');
 		} else {
-			html_add_js(base_url().'modules/text/text-edit.js');
+			html_add_js(base_url() . 'modules/text/text-edit.js');
 		}
-		html_add_css(base_url().'modules/text/text-edit.css');
+		html_add_css(base_url() . 'modules/text/text-edit.css');
 		html_add_js_var('$.glue.conf.text.auto_br', TEXT_AUTO_BR);
-		
+
 		if (TEXT_USE_WOFF_FONTS) {
 			$woff_fonts = _woff_fonts();
-			foreach ($woff_fonts as $font=>$styles) {
+			foreach ($woff_fonts as $font => $styles) {
 				_include_woff_font($font);
 				// TODO (later): check css encoding
-				$rule = '.glue-font-woff-'.$font.' {'.nl();
+				$rule = '.glue-font-woff-' . $font . ' {' . nl();
 				// we use single quotes as they don't clash with inline styles
-				$rule .= tab().'font-family: \''.$font.'\';'.nl();
+				$rule .= tab() . 'font-family: \'' . $font . '\';' . nl();
 				$rule .= '}';
 				html_add_css_inline($rule, 6);
 			}
@@ -414,25 +406,24 @@ function text_render_page_early($args)
 }
 
 
-function text_save_state($args)
-{
+function text_save_state($args) {
 	$elem = $args['elem'];
 	$obj = $args['obj'];
 	if (get_first_item(elem_classes($elem)) != 'text') {
 		return false;
 	}
-	
+
 	// make sure the type is set
 	$obj['type'] = 'text';
 	$obj['module'] = 'text';
-	
+
 	// hook
-	invoke_hook('alter_save', array('obj'=>&$obj, 'elem'=>$elem));
-	
+	invoke_hook('alter_save', array('obj' => &$obj, 'elem' => $elem));
+
 	load_modules('glue');
 	$ret = save_object($obj);
 	if ($ret['#error']) {
-		load_msg('error', 'text_save_state: save_object returned '.quot($ret['#data']));
+		load_msg('error', 'text_save_state: save_object returned ' . quot($ret['#data']));
 		return false;
 	} else {
 		return true;

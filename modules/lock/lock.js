@@ -16,7 +16,7 @@
  *	i.e. $('.glue-selected').not('.locked')
  */
 
-$('.object').live('glue-object-lock', function(e) {
+$('.object').live('glue-object-lock', function (e) {
 	// if object is in locked state
 	// disable dragging and resize
 
@@ -27,35 +27,36 @@ $('.object').live('glue-object-lock', function(e) {
 		if ($(this).hasClass('text')) {
 			$(this).children('textarea').css('resize', 'none');
 		}
-	} 
+	}
 });
 
 
-$(document).ready(function() {
+$(document).ready(function () {
 	//
 	// trigger object lock check 
 	//
 	$('.object').trigger('glue-object-lock');
-	
+
 	//
 	// register menu items
 	//
 	var elem;
 	$.glue.contextmenu.hide();
 
-	elem = $('<img src="'+$.glue.base_url+'modules/lock/lock.png" alt="btn" title="lock object" width="32" height="32">');
+	elem = $('<img src="' + $.glue.base_url + 'modules/lock/lock.png" alt="btn" title="lock object" width="32" height="32">');
 
-	$(elem).bind('glue-menu-activate', function(e) {
+	$(elem).bind('glue-menu-activate', function (e) {
 		var obj = $(this).data('owner');
-		var tip 
+		var tip
 		if ($(obj).hasClass('locked')) {
 			tip = 'object is locked, click to unlock it';
-		} else { tip = 'lock object'; 
+		} else {
+			tip = 'lock object';
 		}
 		$(this).attr('title', tip);
 	});
 
-	$(elem).bind('click', function(e) {
+	$(elem).bind('click', function (e) {
 		var that = this;
 		var obj = $(this).data('owner');
 
@@ -78,6 +79,6 @@ $(document).ready(function() {
 		$(that).trigger('glue-menu-activate');
 		$.glue.object.save(obj);
 	});
-	
+
 	$.glue.contextmenu.register('object', 'object-lock', elem, 19);
 });

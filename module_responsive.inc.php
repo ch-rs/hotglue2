@@ -15,22 +15,21 @@ require_once('html.inc.php');
 require_once('util.inc.php');
 
 
-function responsive_render_page_early($args)
-{
+function responsive_render_page_early($args) {
 	if ($args['edit']) {
 		if (USE_MIN_FILES) {
-			html_add_js(base_url().'modules/responsive/responsive-edit.min.js');
+			html_add_js(base_url() . 'modules/responsive/responsive-edit.min.js');
 		} else {
-			html_add_js(base_url().'modules/responsive/responsive-edit.js');
+			html_add_js(base_url() . 'modules/responsive/responsive-edit.js');
 		}
-		html_add_css(base_url().'modules/responsive/responsive-edit.css');
+		html_add_css(base_url() . 'modules/responsive/responsive-edit.css');
 	}
-	
-	html_add_css(base_url().'modules/responsive/responsive.css');
+
+	html_add_css(base_url() . 'modules/responsive/responsive.css');
 
 	// set reponsive mode
 	load_modules('glue');
-    $obj = load_object(array('name'=>$args['page'].'.page'));
+	$obj = load_object(array('name' => $args['page'] . '.page'));
 
 	if (isset($obj['#data']['page-responsive-mode']) && $obj['#data']['page-responsive-mode'] != 'default') {
 		html_add_data('responsive-mode', $obj['#data']['page-responsive-mode']);

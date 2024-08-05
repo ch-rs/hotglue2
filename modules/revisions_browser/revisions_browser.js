@@ -7,16 +7,16 @@
  *	See the file COPYING for more details.
  */
 
-$(document).ready(function() {
-	$('#revisions_browser_revert_btn').bind('click', function(e) {
-		$.glue.backend({ method: 'glue.revert', page: $.glue.page }, function(data) {
+$(document).ready(function () {
+	$('#revisions_browser_revert_btn').bind('click', function (e) {
+		$.glue.backend({ method: 'glue.revert', page: $.glue.page }, function (data) {
 			var a = $.glue.page.split('.');
-			window.location = $.glue.base_url+'?'+a[0]+'/edit';		
+			window.location = $.glue.base_url + '?' + a[0] + '/edit';
 		});
 		return false;
 	});
-		
-	$(document).bind('keydown', function(e) {
+
+	$(document).bind('keydown', function (e) {
 		// keyboard navigation
 		if (e.which == 37 && $('#revisions_browser_prev > a').length) {
 			window.location = $('#revisions_browser_prev > a').attr('href');

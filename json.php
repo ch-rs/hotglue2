@@ -23,36 +23,36 @@ header('Content-Type: application/json; charset=UTF-8');
 // get method and arguments
 $args = array();
 switch ($_SERVER['REQUEST_METHOD']) {
-	// we don't use $_REQUEST here because this includes cookies as well
-	// disable support for GET to make cross site request forgery (xsrf) 
-	// at least harder to do
-	//case 'GET':
-	//	foreach ($_GET as $key=>$val) {
-	//		if (get_magic_quotes_gpc()) {
-	//			$val = stripslashes($val);
-	//		}
-	//		$dec = @json_decode($val, true);
-	//		if ($dec === NULL) {
-	//			$err = response('Error decoding the argument '.quot($key).' => '.var_dump_inl($val), 400);
-	//			echo json_encode($err);
-	//			log_msg('warn', 'json: '.$err['#data']);
-	//			die();
-	//		} else {
-	//			$args[$key] = $dec;
-	//		}
-	//	}
-	//	break;
+		// we don't use $_REQUEST here because this includes cookies as well
+		// disable support for GET to make cross site request forgery (xsrf) 
+		// at least harder to do
+		//case 'GET':
+		//	foreach ($_GET as $key=>$val) {
+		//		if (get_magic_quotes_gpc()) {
+		//			$val = stripslashes($val);
+		//		}
+		//		$dec = @json_decode($val, true);
+		//		if ($dec === NULL) {
+		//			$err = response('Error decoding the argument '.quot($key).' => '.var_dump_inl($val), 400);
+		//			echo json_encode($err);
+		//			log_msg('warn', 'json: '.$err['#data']);
+		//			die();
+		//		} else {
+		//			$args[$key] = $dec;
+		//		}
+		//	}
+		//	break;
 	case 'POST':
-		foreach ($_POST as $key=>$val) {
-            if ($key !== "html" && $key !== "content") {
-                $val = stripslashes($val);
-            }
-            
+		foreach ($_POST as $key => $val) {
+			if ($key !== "html" && $key !== "content") {
+				$val = stripslashes($val);
+			}
+
 			$dec = @json_decode($val, true);
 			if ($dec === NULL) {
-				$err = response('Error decoding the argument '.quot($key).' => '.var_dump_inl($val), 400);
+				$err = response('Error decoding the argument ' . quot($key) . ' => ' . var_dump_inl($val), 400);
 				echo json_encode($err);
-				log_msg('warn', 'json: '.$err['#data']);
+				log_msg('warn', 'json: ' . $err['#data']);
 				die();
 			} else {
 				$args[$key] = $dec;
@@ -63,7 +63,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
 		//$err = response('Only HTTP GET and POST requests supported', 400);
 		$err = response('Only HTTP POST requests supported', 400);
 		echo json_encode($err);
-		log_msg('warn', 'json: '.$err['#data']);
+		log_msg('warn', 'json: ' . $err['#data']);
 		die();
 }
 
@@ -71,24 +71,24 @@ switch ($_SERVER['REQUEST_METHOD']) {
 if (!empty($args['method'])) {
 	$method = $args['method'];
 	unset($args['method']);
-	log_msg('debug', 'json: method is '.quot($method));
-	log_msg('debug', 'json: arguments are '.var_dump_inl($args));
-	log_msg('debug', 'json: base url is '.quot(base_url()));
+	log_msg('debug', 'json: method is ' . quot($method));
+	log_msg('debug', 'json: arguments are ' . var_dump_inl($args));
+	log_msg('debug', 'json: base url is ' . quot(base_url()));
 } else {
 	// this can also be caused by an upload exceeding the limits 
 	// set in php.ini
 	$err = response('Required argument "method" missing', 400);
 	echo json_encode($err);
-	log_msg('warn', 'json: '.$err['#data']);
+	log_msg('warn', 'json: ' . $err['#data']);
 	die();
 }
 
 load_modules($method);
 
 if (!($m = get_service($method))) {
-	$err = response('Unknown method '.quot($method), 400);
+	$err = response('Unknown method ' . quot($method), 400);
 	echo json_encode($err);
-	log_msg('warn', 'json: '.$err['#data']);
+	log_msg('warn', 'json: ' . $err['#data']);
 	die();
 }
 
@@ -108,7 +108,7 @@ if (isset($m['cross-origin']) && $m['cross-origin']) {
 		$bu = base_url();
 		if (substr($_SERVER['HTTP_REFERER'], 0, strlen($bu)) != $bu) {
 			echo json_encode(response('Cross-origin requests not supported for this method', 400));
-			log_msg('warn', 'json: possible xsrf detected, referer is '.quot($_SERVER['HTTP_REFERER']).', arguments '.var_dump_inl($args));
+			log_msg('warn', 'json: possible xsrf detected, referer is ' . quot($_SERVER['HTTP_REFERER']) . ', arguments ' . var_dump_inl($args));
 			die();
 		}
 	}
@@ -117,8 +117,8 @@ if (isset($m['cross-origin']) && $m['cross-origin']) {
 // run service and output result
 $ret = run_service($method, $args);
 if (is_array($ret) && isset($ret['#error']) && $ret['#error']) {
-	log_msg('warn', 'json: service '.$method.' returned error '.quot($ret['#data']));
+	log_msg('warn', 'json: service ' . $method . ' returned error ' . quot($ret['#data']));
 } elseif (is_array($ret) && isset($ret['#data'])) {
-	log_msg('debug', 'json: service returned '.var_dump_inl($ret['#data']));
+	log_msg('debug', 'json: service returned ' . var_dump_inl($ret['#data']));
 }
 echo json_encode($ret);

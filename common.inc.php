@@ -22,49 +22,48 @@ require_once('modules.inc.php');
  *	@param string $out content
  *	@return true if successful, false if not
  */
-function cache_output($category, $name, $out)
-{
+function cache_output($category, $name, $out) {
 	// don't cache the output if we're using https
 	if (!empty($_SERVER['HTTPS'])) {
-		log_msg('debug', 'common: not caching '.quot($name).' because of https');
+		log_msg('debug', 'common: not caching ' . quot($name) . ' because of https');
 		return false;
 	}
-	
+
 	// check if cache dir exists
-	$f = CONTENT_DIR.'/cache';
+	$f = CONTENT_DIR . '/cache';
 	if (!is_dir($f)) {
 		$m = umask(0000);
 		if (!@mkdir($f, 0777)) {
 			umask($m);
-			log_msg('error', 'common: cannot create cache directory '.quot($f));
+			log_msg('error', 'common: cannot create cache directory ' . quot($f));
 			return false;
 		}
 		umask($m);
 	}
-	
+
 	// check if category subdirectory exists
-	$f .= '/'.$category;
+	$f .= '/' . $category;
 	if (!is_dir($f)) {
 		$m = umask(0000);
 		if (!@mkdir($f, 0777)) {
 			umask($m);
-			log_msg('error', 'common: cannot create cache directory '.quot($f));
+			log_msg('error', 'common: cannot create cache directory ' . quot($f));
 			return false;
 		}
 		umask($m);
 	}
-	
+
 	// save file
-	$f .= '/'.$name;
+	$f .= '/' . $name;
 	$m = umask(0111);
 	if (!file_put_contents($f, $out)) {
 		umask($m);
-		log_msg('error', 'common: error writing cache file '.quot($f));
+		log_msg('error', 'common: error writing cache file ' . quot($f));
 		return false;
 	}
 	umask($m);
-	
-	log_msg('debug', 'common: cached '.$category.' '.quot($name));
+
+	log_msg('debug', 'common: cached ' . $category . ' ' . quot($name));
 	return true;
 }
 
@@ -75,39 +74,38 @@ function cache_output($category, $name, $out)
  *	see html.inc.php.
  *	@param bool $add_glue true for adding the glue code
  */
-function default_html($add_glue)
-{
+function default_html($add_glue) {
 	html_title(SITE_NAME);
 	$favicon = FAVICON;
 	if (!empty($favicon)) {
 		if (is_url($favicon)) {
 			html_favicon($favicon);
 		} else {
-			html_favicon(base_url().$favicon);
+			html_favicon(base_url() . $favicon);
 		}
 	}
 	if (USE_MIN_FILES) {
-		html_add_css(base_url().'css/reset.min.css', 1);
+		html_add_css(base_url() . 'css/reset.min.css', 1);
 	} else {
-		html_add_css(base_url().'css/reset.css', 1);
+		html_add_css(base_url() . 'css/reset.css', 1);
 	}
 	// 2 can be used for third-party components
-	html_add_css(base_url().'css/main.css', 3);
+	html_add_css(base_url() . 'css/main.css', 3);
 	if ($add_glue) {
-		html_add_css(base_url().'css/glue.css', 4);
+		html_add_css(base_url() . 'css/glue.css', 4);
 	}
 	if ($add_glue) {
 		$jquery = JQUERY;
 		if (is_url($jquery)) {
 			html_add_js($jquery, 1);
 		} else {
-			html_add_js(base_url().$jquery, 1);
+			html_add_js(base_url() . $jquery, 1);
 		}
 		// 2 can be used for third-party components
 		if (USE_MIN_FILES) {
-			html_add_js(base_url().'js/glue.min.js', 3);
+			html_add_js(base_url() . 'js/glue.min.js', 3);
 		} else {
-			html_add_js(base_url().'js/glue.js', 3);
+			html_add_js(base_url() . 'js/glue.js', 3);
 		}
 		html_add_js_var('$.glue.base_url', base_url());
 		html_add_js_var('$.glue.conf.show_frontend_errors', SHOW_FRONTEND_ERRORS);
@@ -123,24 +121,23 @@ function default_html($add_glue)
  *	@param string $category cache category (e.g. 'page')
  *	@param string $name item name (optional)
  */
-function drop_cache($category, $name = '')
-{
+function drop_cache($category, $name = '') {
 	if (empty($name)) {
-		$d = @scandir(CONTENT_DIR.'/cache/'.$category);
+		$d = @scandir(CONTENT_DIR . '/cache/' . $category);
 		if ($d === false) {
 			return;
 		}
 	} else {
 		$d = array($name);
 	}
-	
+
 	foreach ($d as $f) {
 		if ($f == '.' || $f == '..') {
 			continue;
 		}
-		$fn = CONTENT_DIR.'/cache/'.$category.'/'.$f;
+		$fn = CONTENT_DIR . '/cache/' . $category . '/' . $f;
 		if (@unlink($fn)) {
-			log_msg('debug', 'common: dropped cache of '.$category.' '.quot($f));
+			log_msg('debug', 'common: dropped cache of ' . $category . ' ' . quot($f));
 		}
 	}
 }
@@ -151,11 +148,10 @@ function drop_cache($category, $name = '')
  *
  *	@return array (with length three)
  */
-function glue_version()
-{
+function glue_version() {
 	$a = expl('.', HOTGLUE_VERSION);
 	$ret = array(0, 0, 0);
-	for ($i=0; $i < count($a); $i++) {
+	for ($i = 0; $i < count($a); $i++) {
 		$ret[$i] = intval($a[$i]);
 	}
 	return $ret;
@@ -165,32 +161,31 @@ function glue_version()
 /**
  *	invoke a hook when an update was detected
  */
-function handle_updates()
-{
+function handle_updates() {
 	$new = glue_version();
 	$write_file = false;
-	
-	if (($s = @file_get_contents(CONTENT_DIR.'/version')) !== false) {
+
+	if (($s = @file_get_contents(CONTENT_DIR . '/version')) !== false) {
 		// parse version
 		$a = expl('.', $s);
 		$old = array(0, 0, 0);
-		for ($i=0; $i < count($a); $i++) {
+		for ($i = 0; $i < count($a); $i++) {
 			$old[$i] = $a[$i];
 		}
 		// check if an update happened
 		if ($old != $new) {
-			log_msg('info', 'common: detected hotglue update from version '.implode('.', $old).' to '.implode('.', $new));
+			log_msg('info', 'common: detected hotglue update from version ' . implode('.', $old) . ' to ' . implode('.', $new));
 			// hook
-			invoke_hook('glue_update', array('old'=>$old, 'new'=>$new));
+			invoke_hook('glue_update', array('old' => $old, 'new' => $new));
 			$write_file = true;
 		}
 	} else {
 		$write_file = true;
 	}
-	
+
 	if ($write_file) {
 		$m = umask(0111);
-		@file_put_contents(CONTENT_DIR.'/version', implode('.', $new));
+		@file_put_contents(CONTENT_DIR . '/version', implode('.', $new));
 		umask($m);
 	}
 }
@@ -204,8 +199,7 @@ function handle_updates()
  *	@param bool $no_header don't output any header
  *	@return false if the error code is not supported yet
  */
-function hotglue_error($code, $no_header = false)
-{
+function hotglue_error($code, $no_header = false) {
 	if (!$no_header) {
 		// output header
 		if (USE_HOTGLUE_ERRORS) {
@@ -217,53 +211,53 @@ function hotglue_error($code, $no_header = false)
 			return false;
 		}
 	}
-	
+
 	// output informative message
 	html_flush();
 	default_html(false);
-	html_add_css(base_url().'css/hotglue_error.css');
+	html_add_css(base_url() . 'css/hotglue_error.css');
 	$bdy = &body();
 	elem_attr($bdy, 'id', 'hotglue_error');
-	body_append(tab(1).'<div id="paper">'.nl());
-	body_append(tab(2).'<div id="wrapper">'.nl());
-	body_append(tab(3).'<div id="content">'.nl());
-	body_append(tab(4).'<div id="left-nav">'.nl());
-	body_append(tab(5).'<img src="'.htmlspecialchars(base_url(), ENT_COMPAT, 'UTF-8').'img/hotglue-logo.png" alt="logo">'.nl());
-	body_append(tab(4).'</div>'.nl());
-	body_append(tab(4).'<div id="main">'.nl());
+	body_append(tab(1) . '<div id="paper">' . nl());
+	body_append(tab(2) . '<div id="wrapper">' . nl());
+	body_append(tab(3) . '<div id="content">' . nl());
+	body_append(tab(4) . '<div id="left-nav">' . nl());
+	body_append(tab(5) . '<img src="' . htmlspecialchars(base_url(), ENT_COMPAT, 'UTF-8') . 'img/hotglue-logo.png" alt="logo">' . nl());
+	body_append(tab(4) . '</div>' . nl());
+	body_append(tab(4) . '<div id="main">' . nl());
 	if ($code == 400) {
-		body_append(tab(5).'<h1 id="error-title">ERROR 400, bad request!</h1>'.nl());
+		body_append(tab(5) . '<h1 id="error-title">ERROR 400, bad request!</h1>' . nl());
 	} elseif ($code == 401) {
-		body_append(tab(5).'<h1 id="error-title">Authorization required!</h1>'.nl());	
+		body_append(tab(5) . '<h1 id="error-title">Authorization required!</h1>' . nl());
 	} elseif ($code == 404) {
-		body_append(tab(5).'<h1 id="error-title">ERROR 404, not found!</h1>'.nl());	
+		body_append(tab(5) . '<h1 id="error-title">ERROR 404, not found!</h1>' . nl());
 	} elseif ($code == 500) {
-		body_append(tab(5).'<h1 id="error-title">ERROR 500, server fault!</h1>'.nl());	
+		body_append(tab(5) . '<h1 id="error-title">ERROR 500, server fault!</h1>' . nl());
 	}
-	body_append(tab(5).'<p>'.nl());
+	body_append(tab(5) . '<p>' . nl());
 	if ($code == 400) {
-		body_append(tab(6).'Something got screwed up...<br>'.nl());
-		body_append(tab(6).'The page is sending a bad request to the server!'.nl());
+		body_append(tab(6) . 'Something got screwed up...<br>' . nl());
+		body_append(tab(6) . 'The page is sending a bad request to the server!' . nl());
 	} elseif ($code == 401) {
-		body_append(tab(6).'You need to be logged in in order to do this.<br>'.nl());
+		body_append(tab(6) . 'You need to be logged in in order to do this.<br>' . nl());
 	} elseif ($code == 404) {
-		body_append(tab(6).'It looks like you got lost in cyber-space...<br>'.nl());
-		body_append(tab(6).'The page you are trying to reach does not exist!'.nl());
+		body_append(tab(6) . 'It looks like you got lost in cyber-space...<br>' . nl());
+		body_append(tab(6) . 'The page you are trying to reach does not exist!' . nl());
 	} elseif ($code == 500) {
-		body_append(tab(6).'Are we runnining out of fuel?!<br>'.nl());
-		body_append(tab(6).'Something is causing serious server errors!'.nl());
+		body_append(tab(6) . 'Are we runnining out of fuel?!<br>' . nl());
+		body_append(tab(6) . 'Something is causing serious server errors!' . nl());
 	}
-	body_append(tab(5).'</p>'.nl());
-	body_append(tab(6).'<a href="'.htmlspecialchars(base_url(), ENT_COMPAT, 'UTF-8').'" id="home">take me home!</a>'.nl());
-	body_append(tab(4).'</div>'.nl());
-	body_append(tab(3).'</div>'.nl());
-	body_append(tab(2).'</div>'.nl());
-	body_append(tab(2).'<div style="position: absolute; left: 200px; top: -10px; z-index: 2;">'.nl());
-	body_append(tab(3).'<img src="'.htmlspecialchars(base_url(), ENT_COMPAT, 'UTF-8').'img/hotglue-404.png" alt="404">'.nl());
-	body_append(tab(2).'</div>'.nl());
-	body_append(tab(1).'</div>'.nl());
+	body_append(tab(5) . '</p>' . nl());
+	body_append(tab(6) . '<a href="' . htmlspecialchars(base_url(), ENT_COMPAT, 'UTF-8') . '" id="home">take me home!</a>' . nl());
+	body_append(tab(4) . '</div>' . nl());
+	body_append(tab(3) . '</div>' . nl());
+	body_append(tab(2) . '</div>' . nl());
+	body_append(tab(2) . '<div style="position: absolute; left: 200px; top: -10px; z-index: 2;">' . nl());
+	body_append(tab(3) . '<img src="' . htmlspecialchars(base_url(), ENT_COMPAT, 'UTF-8') . 'img/hotglue-404.png" alt="404">' . nl());
+	body_append(tab(2) . '</div>' . nl());
+	body_append(tab(1) . '</div>' . nl());
 	echo html_finalize();
-	
+
 	die();
 }
 
@@ -273,14 +267,13 @@ function hotglue_error($code, $no_header = false)
  *
  *	@return true if authenticated, false if not
  */
-function is_auth()
-{
+function is_auth() {
 	if (AUTH_METHOD == 'none') {
 		log_msg('debug', 'common: auth success (auth_method none)');
 		return true;
 	} elseif (AUTH_METHOD == 'basic') {
 		if (isset($_SERVER['Authorization'])) {
-			list($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']) = explode(':' , base64_decode(substr($_SERVER['Authorization'], 6)));
+			list($_SERVER['PHP_AUTH_USER'], $_SERVER['PHP_AUTH_PW']) = explode(':', base64_decode(substr($_SERVER['Authorization'], 6)));
 		}
 		if (isset($_SERVER['PHP_AUTH_USER']) && isset($_SERVER['PHP_AUTH_PW'])) {
 			if ($_SERVER['PHP_AUTH_USER'] == AUTH_USER && $_SERVER['PHP_AUTH_PW'] == AUTH_PASSWORD) {
@@ -292,7 +285,7 @@ function is_auth()
 			}
 		} else {
 			if (!empty($_SERVER['HTTP_AUTHORIZATION'])) {
-				log_msg('warn', 'common: no auth data (auth_method basic) but HTTP_AUTHORIZATION is '.quot(var_dump_inl($_SERVER['HTTP_AUTHORIZATION'])));
+				log_msg('warn', 'common: no auth data (auth_method basic) but HTTP_AUTHORIZATION is ' . quot(var_dump_inl($_SERVER['HTTP_AUTHORIZATION'])));
 			} else {
 				log_msg('debug', 'common: no auth data (auth_method basic)');
 			}
@@ -300,18 +293,18 @@ function is_auth()
 		}
 	} elseif (AUTH_METHOD == 'digest') {
 		if (isset($_SERVER['PHP_AUTH_DIGEST'])) {
-			log_msg('debug', 'common: auth digest '.var_dump_inl($_SERVER['PHP_AUTH_DIGEST']));
-			$res = http_digest_check(array(AUTH_USER=>AUTH_PASSWORD), SITE_NAME);
+			log_msg('debug', 'common: auth digest ' . var_dump_inl($_SERVER['PHP_AUTH_DIGEST']));
+			$res = http_digest_check(array(AUTH_USER => AUTH_PASSWORD), SITE_NAME);
 			if ($res == 0) {
 				log_msg('debug', 'common: auth success (auth_method digest)');
 				return true;
 			} else {
-				log_msg('info', 'common: auth failure '.$res.' (auth_method digest)');
+				log_msg('info', 'common: auth failure ' . $res . ' (auth_method digest)');
 				return false;
 			}
 		} else {
 			if (!empty($_SERVER['HTTP_AUTHORIZATION'])) {
-				log_msg('warn', 'common: no auth data (auth_method digest) but HTTP_AUTHORIZATION is '.quot(var_dump_inl($_SERVER['HTTP_AUTHORIZATION'])));
+				log_msg('warn', 'common: no auth data (auth_method digest) but HTTP_AUTHORIZATION is ' . quot(var_dump_inl($_SERVER['HTTP_AUTHORIZATION'])));
 			} else {
 				log_msg('debug', 'common: no auth data (auth_method digest)');
 			}
@@ -332,15 +325,14 @@ function is_auth()
  *	@param int $max_age serve from cache when younger than $max_age seconds
  *	@return bool true if the page can be served from cache, false if not
  */
-function is_cached($category, $name, $max_age)
-{
+function is_cached($category, $name, $max_age) {
 	// don't use the cached file if we're using https
 	// TODO (later): make a separate cache for https
 	if (!empty($_SERVER['HTTPS'])) {
 		return false;
 	}
-	
-	$f = CONTENT_DIR.'/cache/'.$category.'/'.$name;
+
+	$f = CONTENT_DIR . '/cache/' . $category . '/' . $name;
 	if (!is_file($f)) {
 		return false;
 	}
@@ -351,7 +343,7 @@ function is_cached($category, $name, $max_age)
 		clearstatcache();
 	}
 	$age = filemtime($f);
-	if ($max_age < abs(time()-$age)) {
+	if ($max_age < abs(time() - $age)) {
 		return false;
 	} else {
 		return true;
@@ -365,12 +357,11 @@ function is_cached($category, $name, $max_age)
  *	@param $s object (e.g. page.rev.obj)
  *	@return bool
  */
-function object_exists($s)
-{
+function object_exists($s) {
 	$a = expl('.', $s);
 	// we need not check if any of $a[..] is empty as the resulting string 
 	// cannot be a file anyway
-	if (2 < count($a) && is_file(CONTENT_DIR.'/'.str_replace('.', '/', $s))) {
+	if (2 < count($a) && is_file(CONTENT_DIR . '/' . str_replace('.', '/', $s))) {
 		return true;
 	} else {
 		return false;
@@ -384,8 +375,7 @@ function object_exists($s)
  *	if $s is not a page, the string is not altered.
  *	@param string &$s reference to the page name
  */
-function page_canonical(&$s)
-{
+function page_canonical(&$s) {
 	$a = expl('.', $s);
 	// assume head revision
 	if (count($a) == 1) {
@@ -401,10 +391,9 @@ function page_canonical(&$s)
  *	@param $s page
  *	@return bool
  */
-function page_exists($s)
-{
+function page_exists($s) {
 	$a = expl('.', $s);
-	if (1 < count($a) && !empty($a[0]) && !empty($a[1]) && is_dir(CONTENT_DIR.'/'.$a[0].'/'.$a[1])) {
+	if (1 < count($a) && !empty($a[0]) && !empty($a[1]) && is_dir(CONTENT_DIR . '/' . $a[0] . '/' . $a[1])) {
 		return true;
 	} else {
 		return false;
@@ -418,11 +407,10 @@ function page_exists($s)
  *	@param $s page
  *	@return bool
  */
-function page_reserved($s)
-{
+function page_reserved($s) {
 	$a = expl('.', $s);
 	$r = expl(' ', RESERVED_PAGE_NAMES);
-	if (in_array($a[0], $r)) {		
+	if (in_array($a[0], $r)) {
 		return true;
 	} else {
 		return false;
@@ -436,8 +424,7 @@ function page_reserved($s)
  *	@param $s page
  *	@return string
  */
-function page_short($s)
-{
+function page_short($s) {
 	$a = expl('.', $s);
 	if (count($a) == 1) {
 		return $s;
@@ -457,13 +444,12 @@ function page_short($s)
  *	@param bool $header_only only send header information
  *	this function does not return.
  */
-function prompt_auth($header_only = false)
-{
+function prompt_auth($header_only = false) {
 	if (AUTH_METHOD == 'none') {
 		// nothing to do here
 	} elseif (AUTH_METHOD == 'basic') {
-		header('WWW-Authenticate: Basic realm="'.str_replace("\"", '', SITE_NAME).'"');
-		header($_SERVER['SERVER_PROTOCOL'].' 401 Unauthorized');
+		header('WWW-Authenticate: Basic realm="' . str_replace("\"", '', SITE_NAME) . '"');
+		header($_SERVER['SERVER_PROTOCOL'] . ' 401 Unauthorized');
 	} elseif (AUTH_METHOD == 'digest') {
 		http_digest_prompt(SITE_NAME);
 	} else {
@@ -480,8 +466,7 @@ function prompt_auth($header_only = false)
  *	@param string $name current object name (when applicable)
  *	@return string resolved string
  */
-function resolve_aliases($s, $name = '')
-{
+function resolve_aliases($s, $name = '') {
 	// base url
 	$s = str_replace('$BASEURL$', base_url(), $s);
 	$s = str_replace('$baseurl$', base_url(), $s);
@@ -517,27 +502,26 @@ function resolve_aliases($s, $name = '')
  *	@param string $s input string
  *	@return string resolved string
  */
-function resolve_relative_urls($s)
-{
+function resolve_relative_urls($s) {
 	$attrs = array('href', 'src');
-	
+
 	foreach ($attrs as $attr) {
 		$start = 0;
-		while (($start = strpos($s, $attr.'="', $start)) !== false) {
-			if (($end = strpos($s, '"', $start+strlen($attr)+2)) !== false) {
-				$link = substr($s, $start+strlen($attr)+2, $end-$start-strlen($attr)-2);
+		while (($start = strpos($s, $attr . '="', $start)) !== false) {
+			if (($end = strpos($s, '"', $start + strlen($attr) + 2)) !== false) {
+				$link = substr($s, $start + strlen($attr) + 2, $end - $start - strlen($attr) - 2);
 				if (!is_url($link) && substr($link, 0, 1) != '#') {
 					// add base url for relative links that are not directed towards anchors
-					log_msg('debug', 'common: resolving relative url '.quot($link));
+					log_msg('debug', 'common: resolving relative url ' . quot($link));
 					if (SHORT_URLS) {
-						$link = base_url().$link;
+						$link = base_url() . $link;
 					} else {
-						$link = base_url().'?'.$link;
+						$link = base_url() . '?' . $link;
 					}
 				} else {
-					log_msg('debug', 'common: not resolving url '.quot($link));
+					log_msg('debug', 'common: not resolving url ' . quot($link));
 				}
-				$start = $end+1;
+				$start = $end + 1;
 			} else {
 				break;
 			}
@@ -554,14 +538,13 @@ function resolve_relative_urls($s)
  *	@param string $name item name
  *	@return true if successful, false if not
  */
-function serve_cached($category, $name)
-{
-	$f = CONTENT_DIR.'/cache/'.$category.'/'.$name;
+function serve_cached($category, $name) {
+	$f = CONTENT_DIR . '/cache/' . $category . '/' . $name;
 	if (@readfile($f)) {
-		log_msg('info', 'common: serving '.$category.' '.quot($name).' from cache');
+		log_msg('info', 'common: serving ' . $category . ' ' . quot($name) . ' from cache');
 		return true;
 	} else {
-		log_msg('error', 'common: cannot serve '.$category.' '.quot($name).' from cache');
+		log_msg('error', 'common: cannot serve ' . $category . ' ' . quot($name) . ' from cache');
 		return false;
 	}
 }
@@ -572,11 +555,10 @@ function serve_cached($category, $name)
  *
  *	@return string
  */
-function startpage()
-{
+function startpage() {
 	// read the starting page information from the content dir
 	// or fall back to the one defined in the configuration
-	$s = @file_get_contents(CONTENT_DIR.'/startpage');
+	$s = @file_get_contents(CONTENT_DIR . '/startpage');
 	if ($s !== false && 0 < strlen($s)) {
 		return $s;
 	} else {
@@ -598,36 +580,35 @@ function startpage()
  *	before
  *	@return filename inside the shared directory or false in case of error
  */
-function upload_file($fn, $page, $orig_fn = '', &$existed = false)
-{
+function upload_file($fn, $page, $orig_fn = '', &$existed = false) {
 	// default to the temporary filename
 	if ($orig_fn == '') {
 		$orig_fn = $fn;
 	}
-	
+
 	$a = expl('.', $page);
-	if (count($a) < 1 || !is_dir(CONTENT_DIR.'/'.$a[0])) {
-		log_msg('error', 'common: page '.quot($page).' does not exist, cannot move uploaded file');
+	if (count($a) < 1 || !is_dir(CONTENT_DIR . '/' . $a[0])) {
+		log_msg('error', 'common: page ' . quot($page) . ' does not exist, cannot move uploaded file');
 		// not sure if we ought to remove the file in /tmp here (probably not)
 		return false;
 	}
-	
+
 	// create shared directory if it doesn't exist yet
-	$d = CONTENT_DIR.'/'.$a[0].'/shared';
+	$d = CONTENT_DIR . '/' . $a[0] . '/shared';
 	if (!is_dir($d)) {
 		$m = umask(0000);
 		if (!@mkdir($d, 0777)) {
 			umask($m);
-			log_msg('error', 'common: cannot create shared directory '.quot($d).', cannot move uploaded file');
+			log_msg('error', 'common: cannot create shared directory ' . quot($d) . ', cannot move uploaded file');
 			// not sure if we ought to remove the file in /tmp here (probably not)
 			return false;
 		}
 		umask($m);
 	}
-	
+
 	// check if file is already in shared directory
 	if (($f = dir_has_same_file($d, $fn, $orig_fn)) !== false) {
-		log_msg('info', 'common: reusing file '.quot($f).' instead of newly uploaded file as they don\'t differ');
+		log_msg('info', 'common: reusing file ' . quot($f) . ' instead of newly uploaded file as they don\'t differ');
 		@unlink($fn);
 		$existed = true;
 		return $f;
@@ -635,14 +616,14 @@ function upload_file($fn, $page, $orig_fn = '', &$existed = false)
 		// at least give it a unique name
 		$f = unique_filename($d, basename($orig_fn));
 		$m = umask(0111);
-		if (!@move_uploaded_file($fn, $d.'/'.$f)) {
+		if (!@move_uploaded_file($fn, $d . '/' . $f)) {
 			umask($m);
-			log_msg('error', 'common: error moving uploaded file to '.quot($d.'/'.$f));
+			log_msg('error', 'common: error moving uploaded file to ' . quot($d . '/' . $f));
 			// not sure if we ought to remove the file in /tmp here (probably not)
 			return false;
 		} else {
 			umask($m);
-			log_msg('info', 'common: moved uploaded file to '.quot($d.'/'.$f));
+			log_msg('info', 'common: moved uploaded file to ' . quot($d . '/' . $f));
 			$existed = false;
 			return $f;
 		}
@@ -657,8 +638,7 @@ function upload_file($fn, $page, $orig_fn = '', &$existed = false)
  *	@param string $s string to check
  *	@return bool
  */
-function valid_pagename($s)
-{
+function valid_pagename($s) {
 	$a = expl('.', $s);
 	if (count($a) != 2) {
 		return false;

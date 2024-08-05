@@ -33,15 +33,15 @@ error_reporting(E_ALL & ~E_STRICT);						// see php documentation
 @define('FAVICON', 'img/favicon.ico');		// can be empty or an absolute url
 @define('HOTGLUE_VERSION', '1.0.4pre');		// expected api.version.patchlevel
 @define('IE8_COMPAT', true);				// try to be compatible with Internet Explorer 8 in viewing mode (also make sure that TEXT_USE_WOFF_FONTS is set to false)
-@define('JQUERY', 'js/jquery-1.5.2.min.js');// can be an absolute url
+@define('JQUERY', 'js/jquery-1.5.2.min.js'); // can be an absolute url
 @define('LOCK_TIME', 5000);					// maximum time in ms to wait for an object lock
 @define('LOG_FILE', 'content/log.txt');		// log file, must be writable
 @define('LOG_LEVEL', 'error');				// minimum log level (can be error, warn, info, debug)
 @define('SHORT_URLS', false);				// use short urls internally
 @define('SHOW_FRONTEND_ERRORS', true);
 @define('SITE_NAME', 'hotglue 1.0');
-@define('SNAPSHOT_MAX_AGE', 60*60*24*7);	// auto- revisions are automatically deleted after n seconds (zero to disable)
-@define('SNAPSHOT_MIN_AGE', 60*60);			// auto- revisions are created every n seconds (zero to disable)
+@define('SNAPSHOT_MAX_AGE', 60 * 60 * 24 * 7);	// auto- revisions are automatically deleted after n seconds (zero to disable)
+@define('SNAPSHOT_MIN_AGE', 60 * 60);			// auto- revisions are created every n seconds (zero to disable)
 @define('USE_HOTGLUE_ERRORS', true);		// use hotglue theming for error pages
 @define('USE_MIN_FILES', true);				// use minified files if possible (see also JQUERY define)
 // default modules
@@ -61,9 +61,9 @@ error_reporting(E_ALL & ~E_STRICT);						// see php documentation
 @define('TEXT_AUTO_BR', true);				// automatically add <br> elements for newlines
 @define('TEXT_USE_WOFF_FONTS', true);		// (experimental) offer woff webfonts (supported by Firefox 3.6+, Chrome 5.0+, Internet Explorer 9)
 @define('VIDEO_START_ON_CLICK', true);		// start video on click when autoplay is off
-@define('VIEW_NEEDS_AUTH', false);			
+@define('VIEW_NEEDS_AUTH', false);
 
-@define ('STATIC_DIR', 'static'); // directory for built HTML website with module_build.inc.php
+@define('STATIC_DIR', 'static'); // directory for built HTML website with module_build.inc.php
 @define('STATIC_UPLOAD_DIR', '/uploads'); // directory for static file uploads inside STATIC_DIR
 
 // viewing pages requires authentication
@@ -73,8 +73,7 @@ error_reporting(E_ALL & ~E_STRICT);						// see php documentation
  *
  * @return bool
  */
-function is_base_url_secure()
-{
+function is_base_url_secure() {
 	if (!empty($_SERVER['HTTPS'])) {
 		return true;
 	}
@@ -92,8 +91,7 @@ function is_base_url_secure()
  *
  *	@return string base url (not html-encoded)
  */
-function base_url()
-{
+function base_url() {
 	global $base_url_cached;
 
 	$temp = BASE_URL;
@@ -101,15 +99,15 @@ function base_url()
 		return $temp;
 	}
 	if (isset($base_url_cached)) {
-        return $base_url_cached;
+		return $base_url_cached;
 	} elseif (!isset($base_url_cached)) {
 		if (!is_base_url_secure()) {
-			$base_url_cached = 'http://'.$_SERVER['HTTP_HOST'];
+			$base_url_cached = 'http://' . $_SERVER['HTTP_HOST'];
 			if ($_SERVER['SERVER_PORT'] != '80') {
 				$base_url_cached .= ':' . $_SERVER['SERVER_PORT'];
 			}
 		} else {
-			$base_url_cached = 'https://'.$_SERVER['HTTP_HOST'];
+			$base_url_cached = 'https://' . $_SERVER['HTTP_HOST'];
 			if ($_SERVER['SERVER_PORT'] != '443' && $_SERVER['SERVER_PORT'] != '80') {
 				$base_url_cached .= ':' . $_SERVER['SERVER_PORT'];
 			}

@@ -12,5 +12,5 @@ html[data-responsive-mode="fluid-tiles"] body:before {
     height: 100%;
     pointer-events: none;
     background-size: calc(var(--container-width) * 1px) 40px;
-    background-image:  linear-gradient(to right, #ddd 1px, transparent 1px);
+    background-image: linear-gradient(to right, #ddd 1px, transparent 1px);
 }

@@ -15,7 +15,7 @@
 	margin-top: 3px;
 }
 
-.page_browser_pagename > a {
+.page_browser_pagename>a {
 	text-decoration: none;
 }
 
@@ -28,6 +28,6 @@
 	padding-left: 10px;
 }
 
-.page_browser_actions > a:hover{
+.page_browser_actions>a:hover {
 	color: black;
 }

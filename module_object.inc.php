@@ -19,14 +19,13 @@ require_once('util.inc.php');
 // (they can be easier than that one though)
 
 
-function object_alter_render_early($args)
-{
+function object_alter_render_early($args) {
 	$elem = &$args['elem'];
 	$obj = $args['obj'];
 	if (!elem_has_class($elem, 'object')) {
 		return false;
 	}
-	
+
 	if (!empty($obj['object-height'])) {
 		elem_css($elem, 'height', $obj['object-height']);
 	}
@@ -46,13 +45,12 @@ function object_alter_render_early($args)
 	if (!empty($obj['object-zindex'])) {
 		elem_css($elem, 'z-index', $obj['object-zindex']);
 	}
-	
+
 	return true;
 }
 
 
-function object_alter_render_late($args)
-{
+function object_alter_render_late($args) {
 	$elem = $args['elem'];
 	$html = &$args['html'];
 	$obj = $args['obj'];
@@ -63,7 +61,7 @@ function object_alter_render_late($args)
 		// add links only for viewing
 		if (!empty($obj['object-link'])) {
 			$link = $obj['object-link'];
-			if(!empty($obj['object-target'])) {
+			if (!empty($obj['object-target'])) {
 				$target = $obj['object-target'];
 			}
 			// resolve any aliases
@@ -71,9 +69,9 @@ function object_alter_render_late($args)
 			if (!is_url($link) && substr($link, 0, 1) != '#') {
 				// add base url for relative links that are not directed towards anchors
 				if (SHORT_URLS) {
-					$link = base_url().urlencode($link);
+					$link = base_url() . urlencode($link);
 				} else {
-					$link = base_url().'?'.urlencode($link);
+					$link = base_url() . '?' . urlencode($link);
 				}
 			}
 			// <a> can include block elements in html5
@@ -82,9 +80,9 @@ function object_alter_render_late($args)
 			}
 			// if target is specified use it in link
 			if (isset($target)) {
-				$html = '<a href="'.htmlspecialchars($link, ENT_COMPAT, 'UTF-8').'" target="'.htmlspecialchars($target, ENT_COMPAT, 'UTF-8').'">'."\n\t".str_replace("\n", "\n\t", $html)."\n".'</a>'."\n";
+				$html = '<a href="' . htmlspecialchars($link, ENT_COMPAT, 'UTF-8') . '" target="' . htmlspecialchars($target, ENT_COMPAT, 'UTF-8') . '">' . "\n\t" . str_replace("\n", "\n\t", $html) . "\n" . '</a>' . "\n";
 			} else {
-				$html = '<a href="'.htmlspecialchars($link, ENT_COMPAT, 'UTF-8').'">'."\n\t".str_replace("\n", "\n\t", $html)."\n".'</a>'."\n";
+				$html = '<a href="' . htmlspecialchars($link, ENT_COMPAT, 'UTF-8') . '">' . "\n\t" . str_replace("\n", "\n\t", $html) . "\n" . '</a>' . "\n";
 			}
 			return true;
 		}
@@ -93,14 +91,13 @@ function object_alter_render_late($args)
 }
 
 
-function object_alter_save($args)
-{
+function object_alter_save($args) {
 	$elem = $args['elem'];
 	$obj = &$args['obj'];
 	if (!elem_has_class($elem, 'object')) {
 		return false;
 	}
-	
+
 	if (elem_css($elem, 'height') !== NULL) {
 		$obj['object-height'] = elem_css($elem, 'height');
 	} else {
@@ -131,20 +128,19 @@ function object_alter_save($args)
 	} else {
 		unset($obj['object-zindex']);
 	}
-	
+
 	return true;
 }
 
 
-function object_render_page_early($args)
-{
+function object_render_page_early($args) {
 	if ($args['edit']) {
 		if (USE_MIN_FILES) {
-			html_add_js(base_url().'modules/object/object-edit.min.js');
+			html_add_js(base_url() . 'modules/object/object-edit.min.js');
 		} else {
-			html_add_js(base_url().'modules/object/object-edit.js');
+			html_add_js(base_url() . 'modules/object/object-edit.js');
 		}
-		
+
 		// add default colors
 		html_add_js_var('$.glue.conf.object.default_colors', expl(' ', OBJECT_DEFAULT_COLORS));
 	}

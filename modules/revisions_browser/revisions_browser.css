@@ -23,7 +23,8 @@
 	text-align: center;
 }
 
-#revisions_browser_prev, #revisions_browser_next {
+#revisions_browser_prev,
+#revisions_browser_next {
 	float: left;
 	height: 100%;
 	max-width: 25%;

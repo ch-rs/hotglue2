@@ -8,12 +8,12 @@
  * 
  */
 
-$.glue.image = function() {
+$.glue.image = function () {
 	var preload_obj = false;
 	var preload_timer = false;
-	
+
 	return {
-		autoresize: function(obj, mode) {
+		autoresize: function (obj, mode) {
 			if (mode === undefined) {
 				mode = 'center';
 			}
@@ -22,7 +22,7 @@ $.glue.image = function() {
 			if (larger == '0%' && to == '0%') {
 				return;
 			}
-			
+
 			var w = $(obj).width();
 			var h = $(obj).height();
 			var win_w = $(window).width();
@@ -35,18 +35,18 @@ $.glue.image = function() {
 			var do_resize = false;
 			var target_w = w;
 			var target_h = h;
-			
-			if (win_w*larger_f/100 < w) {
-				target_w = win_w*to_f/100;
-				target_h = target_w*h/w;
+
+			if (win_w * larger_f / 100 < w) {
+				target_w = win_w * to_f / 100;
+				target_h = target_w * h / w;
 				do_resize = true;
 			}
-			if (win_h*larger_f/100 < h) {
+			if (win_h * larger_f / 100 < h) {
 				// this is here because target_h could also have been 
 				// already been changed by the lines above
-				if (win_h*to_f/100 < target_h) {
-					target_h = win_h*to_f/100;
-					target_w = target_h*w/h;
+				if (win_h * to_f / 100 < target_h) {
+					target_h = win_h * to_f / 100;
+					target_w = target_h * w / h;
 					do_resize = true;
 				}
 			}
@@ -55,31 +55,31 @@ $.glue.image = function() {
 				//console.log('window is '+$(window).width()+' and '+$(window).height());
 				//console.log('resizing to '+target_w+' and '+target_h);
 				// setup element
-				$(obj).css('width', target_w+'px');
-				$(obj).css('height', target_h+'px');
+				$(obj).css('width', target_w + 'px');
+				$(obj).css('height', target_h + 'px');
 				// DEBUG
 				//console.log('moving from '+$(obj).position().left+' and '+$(obj).position().top);
 				//console.log('to '+($(obj).position().left+(w-target_w)/2)+' and '+($(obj).position().top+(h-target_h)/2));
 				if (mode == 'center') {
-					$(obj).css('left', ($(obj).position().left+(w-target_w)/2)+'px');
-					$(obj).css('top', ($(obj).position().top+(h-target_h)/2)+'px');
+					$(obj).css('left', ($(obj).position().left + (w - target_w) / 2) + 'px');
+					$(obj).css('top', ($(obj).position().top + (h - target_h) / 2) + 'px');
 				}
 				$.glue.object.resizable_update_tooltip(obj);
 				// call resize
 				$.glue.image.resize(obj, mode);
 			}
 		},
-		resize: function(obj, mode) {
+		resize: function (obj, mode) {
 			if (!$.glue.conf.image.resizing || $(obj).css('background-repeat') != 'no-repeat') {
 				return;
 			}
 			if (mode === undefined) {
 				mode = 'center';
 			}
-			
+
 			var width = $(obj).width();
 			var height = $(obj).height();
-			$.glue.backend({ method: 'image.resize', name: $(obj).attr('id'), 'width': width, 'height': height }, function(data) {
+			$.glue.backend({ method: 'image.resize', name: $(obj).attr('id'), 'width': width, 'height': height }, function (data) {
 				if (!data) {
 					// DEBUG
 					console.error('image.resize returned null');
@@ -98,32 +98,32 @@ $.glue.image = function() {
 					$(temp_elem).attr('class', 'glue-object-copy');
 					// this assumes that the borders are equally spaced..
 					if (mode == 'center') {
-						$(temp_elem).css('left', ($(obj).position().left+($(obj).outerWidth()-width)/2)+'px');
-						$(temp_elem).css('top', ($(obj).position().top+($(obj).outerHeight()-height)/2)+'px');
+						$(temp_elem).css('left', ($(obj).position().left + ($(obj).outerWidth() - width) / 2) + 'px');
+						$(temp_elem).css('top', ($(obj).position().top + ($(obj).outerHeight() - height) / 2) + 'px');
 					}
 					// set new url (w & h are only here to prevent caching)
-					$(temp_elem).css('background-image', 'url('+$.glue.base_url+'?'+$(obj).attr('id')+'&w='+width+'&h='+height+')');
+					$(temp_elem).css('background-image', 'url(' + $.glue.base_url + '?' + $(obj).attr('id') + '&w=' + width + '&h=' + height + ')');
 					$(obj).before(temp_elem);
 					// destroy element on move or resize
-					$(obj).one('glue-movestart', function() {
+					$(obj).one('glue-movestart', function () {
 						// remove any copies still left
 						$('.glue-object-copy').remove();
 					});
-					$(obj).one('glue-resizestart', function() {
+					$(obj).one('glue-resizestart', function () {
 						// remove any copies still left
 						$('.glue-object-copy').remove();
 					});
-					$(obj).one('glue-unregister', function() {
+					$(obj).one('glue-unregister', function () {
 						// remove any copies still left
 						$('.glue-object-copy').remove();
 					});
 					preload_obj = temp_elem;
-					preload_timer = setTimeout(function() {
+					preload_timer = setTimeout(function () {
 						// DEBUG
 						//console.log('outer timeout');
-						$(obj).css('background-image', 'url('+$.glue.base_url+'?'+$(obj).attr('id')+'&w='+width+'&h='+height+')');
+						$(obj).css('background-image', 'url(' + $.glue.base_url + '?' + $(obj).attr('id') + '&w=' + width + '&h=' + height + ')');
 						var remove = preload_obj;
-						setTimeout(function() {
+						setTimeout(function () {
 							$(remove).remove();
 							// DEBUG
 							//console.log('inner timeout');
@@ -137,21 +137,21 @@ $.glue.image = function() {
 }();
 
 
-$('.image').live('glue-resizestop', function(e) {
+$('.image').live('glue-resizestop', function (e) {
 	$.glue.image.resize($(this));
 });
 
-$('.image').live('glue-upload-dynamic-late', function(e, loaded) {
+$('.image').live('glue-upload-dynamic-late', function (e, loaded) {
 	var img = loaded;
 	if ($(img).is('img')) {
 		// we should have the exact dimensions of the image by now
 		// resize object
-		$(this).css('width', $(img).width()+'px');
-		$(this).css('height', $(img).height()+'px');
+		$(this).css('width', $(img).width() + 'px');
+		$(this).css('height', $(img).height() + 'px');
 		// update object file
 		$.glue.backend({ method: 'glue.update_object', name: $(this).attr('id'), 'image-file-width': $(img).width(), 'image-file-height': $(img).height() });
 		// set the defaults
-		$(this).css('background-image', 'url('+$(img).attr('src')+')');
+		$(this).css('background-image', 'url(' + $(img).attr('src') + ')');
 		$(this).css('background-repeat', 'no-repeat');
 		$(this).css('background-size', '100% 100%');
 		$(this).css('-moz-background-size', '100% 100%');
@@ -162,20 +162,20 @@ $('.image').live('glue-upload-dynamic-late', function(e, loaded) {
 	}
 });
 
-$('.image').live('glue-upload-static', function(e, mode) {
+$('.image').live('glue-upload-static', function (e, mode) {
 	// this is only getting triggered when the object width and height is set 
 	// immediately after uploading, i.e. when gd is available on the server
 	$.glue.image.autoresize(this, mode);
 });
 
 
-$(document).ready(function() {
+$(document).ready(function () {
 	$.glue.contextmenu.veto('iframe', 'object-link');
 	//
 	// register menu items
 	//
-	var elem = $('<img src="'+$.glue.base_url+'modules/image/image-tile.png" alt="btn" title="toggle image tiling" width="32" height="32">');
-	$(elem).bind('click', function(e) {
+	var elem = $('<img src="' + $.glue.base_url + 'modules/image/image-tile.png" alt="btn" title="toggle image tiling" width="32" height="32">');
+	$(elem).bind('click', function (e) {
 		var obj = $(this).data('owner');
 		if ($(obj).css('background-repeat') != 'no-repeat') {
 			$(obj).css('background-repeat', 'no-repeat');
@@ -191,26 +191,26 @@ $(document).ready(function() {
 		$.glue.object.save(obj);
 	});
 	$.glue.contextmenu.register('image', 'image-tile', elem);
-	
-	elem = $('<img src="'+$.glue.base_url+'modules/image/image-ratio.png" alt="btn" title="reset image size" width="32" height="32">');
-	$(elem).bind('click', function(e) {
+
+	elem = $('<img src="' + $.glue.base_url + 'modules/image/image-ratio.png" alt="btn" title="reset image size" width="32" height="32">');
+	$(elem).bind('click', function (e) {
 		var obj = $(this).data('owner');
 		// get original-{width,height} from backend
-		$.glue.backend({ method: 'glue.load_object', name: $(obj).attr('id') }, function(data) {
+		$.glue.backend({ method: 'glue.load_object', name: $(obj).attr('id') }, function (data) {
 			if (data['image-file-width'] && data['image-file-height']) {
-				var aspect = data['image-file-width']/data['image-file-height'];
+				var aspect = data['image-file-width'] / data['image-file-height'];
 				$(obj).trigger('glue-resizestart');
 				if (e.shiftKey) {
 					// shift: only change aspect ratio
 					// fit height to width
-					$(obj).css('height', ($(obj).width()/aspect)+'px');
+					$(obj).css('height', ($(obj).width() / aspect) + 'px');
 				} else if (e.ctrlKey) {
 					// ctrl: only change aspect ratio
 					// fit width to heigth
-					$(obj).css('width', ($(obj).height()*aspect)+'px');
+					$(obj).css('width', ($(obj).height() * aspect) + 'px');
 				} else {
-					$(obj).css('width', data['image-file-width']+'px');
-					$(obj).css('height', data['image-file-height']+'px');
+					$(obj).css('width', data['image-file-width'] + 'px');
+					$(obj).css('height', data['image-file-height'] + 'px');
 				}
 				$(obj).trigger('glue-resize');
 				$.glue.object.resizable_update_tooltip(obj);
@@ -221,9 +221,9 @@ $(document).ready(function() {
 		});
 	});
 	$.glue.contextmenu.register('image', 'image-ratio', elem);
-	
-	elem = $('<img src="'+$.glue.base_url+'modules/image/image-pos.png" alt="btn" title="adjust image selection" width="32" height="32">');
-	$(elem).bind('mousedown', function(e) {
+
+	elem = $('<img src="' + $.glue.base_url + 'modules/image/image-pos.png" alt="btn" title="adjust image selection" width="32" height="32">');
+	$(elem).bind('mousedown', function (e) {
 		var obj = $(this).data('owner');
 		var a = $(obj).css('background-position').split(' ');
 		if (a.length != 2) {
@@ -241,13 +241,13 @@ $(document).ready(function() {
 			}
 		}
 		var no_change = true;
-		$.glue.slider(e, function(x, y) {
+		$.glue.slider(e, function (x, y) {
 			// background-position-{x,y} does not work in Firefox (but seems to be faster)
-			$(obj).css('background-position', (prev_x_pos+x)+'px '+(prev_y_pos+y)+'px');
+			$(obj).css('background-position', (prev_x_pos + x) + 'px ' + (prev_y_pos + y) + 'px');
 			if (x != 0 || y != 0) {
 				no_change = false;
 			}
-		}, function(x, y) {
+		}, function (x, y) {
 			// reset background position if there was no change at all
 			if (no_change) {
 				$(obj).css('background-position', '');
@@ -259,12 +259,12 @@ $(document).ready(function() {
 		return false;
 	});
 	$.glue.contextmenu.register('image', 'image-pos', elem);
-	
-	elem = $('<img src="'+$.glue.base_url+'img/download.png" alt="btn" title="download original file" width="32" height="32">');
-	$(elem).bind('click', function(e) {
+
+	elem = $('<img src="' + $.glue.base_url + 'img/download.png" alt="btn" title="download original file" width="32" height="32">');
+	$(elem).bind('click', function (e) {
 		var obj = $(this).data('owner');
 		// initiate download
-		window.location = $.glue.base_url+'?'+$(obj).attr('id')+'&download=1';
+		window.location = $.glue.base_url + '?' + $(obj).attr('id') + '&download=1';
 	});
 	$.glue.contextmenu.register('image', 'image-download', elem);
 });

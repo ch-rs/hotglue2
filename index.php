@@ -17,6 +17,6 @@ require_once('modules.inc.php');
 
 
 $args = parse_query_string();
-log_msg('info', 'index: query arguments '.var_dump_inl($args));
-log_msg('debug', 'index: base url is '.quot(base_url()));
+log_msg('info', 'index: query arguments ' . var_dump_inl($args));
+log_msg('debug', 'index: base url is ' . quot(base_url()));
 invoke_controller($args);

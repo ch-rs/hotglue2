@@ -24,8 +24,7 @@ if (!isset($html)) {
  *
  *	@param array &$a reference to an array
  */
-function _array_sort_by_prio(&$a)
-{
+function _array_sort_by_prio(&$a) {
 	// usort makes no guarantee what happens when two entries have the same 
 	// prio
 	usort($a, '_cmp_prio');
@@ -39,8 +38,7 @@ function _array_sort_by_prio(&$a)
  *	@param array $b array to compare
  *	@return int comparison result
  */
-function _cmp_prio($a, $b)
-{
+function _cmp_prio($a, $b) {
 	if ($a['prio'] == $b['prio']) {
 		return 0;
 	}
@@ -53,8 +51,7 @@ function _cmp_prio($a, $b)
  *
  *	@return &array reference to the body element
  */
-function &body()
-{
+function &body() {
 	global $html;
 	return $html['body'];
 }
@@ -65,8 +62,7 @@ function &body()
  *
  *	@param mixed $c content (can be either a string or another element)
  */
-function body_append($c)
-{
+function body_append($c) {
 	global $html;
 	elem_append($html['body'], $c);
 }
@@ -78,9 +74,8 @@ function body_append($c)
  *	@param string $tag element tag
  *	@return array element
  */
-function elem($tag)
-{
-	return array('tag'=>$tag);
+function elem($tag) {
+	return array('tag' => $tag);
 }
 
 
@@ -90,8 +85,7 @@ function elem($tag)
  *	@param array &$elem reference to an element
  *	@param string $c class
  */
-function elem_add_class(&$elem, $c)
-{
+function elem_add_class(&$elem, $c) {
 	if (!@is_array($elem['class'])) {
 		$elem['class'] = array();
 	}
@@ -107,8 +101,7 @@ function elem_add_class(&$elem, $c)
  *	@param array &$elem reference to an element
  *	@param mixed $c content (can be either a string or another element)
  */
-function elem_append(&$elem, $c)
-{
+function elem_append(&$elem, $c) {
 	if (!isset($elem['val'])) {
 		if (is_array($c)) {
 			$elem['val'] = array($c);
@@ -134,8 +127,7 @@ function elem_append(&$elem, $c)
  *	@param string attribute name
  *	@param mixed attribute value (to set it)
  */
-function elem_attr(&$elem)
-{
+function elem_attr(&$elem) {
 	if (func_num_args() == 2) {
 		if (isset($elem[func_get_arg(1)])) {
 			return $elem[func_get_arg(1)];
@@ -154,8 +146,7 @@ function elem_attr(&$elem)
  *	@param array $elem element
  *	@return array
  */
-function elem_classes($elem)
-{
+function elem_classes($elem) {
 	if (@is_array($elem['class'])) {
 		return $elem['class'];
 	} else {
@@ -171,8 +162,7 @@ function elem_classes($elem)
  *	@param string css property name
  *	@param mixed css property value (to set it; empty string to clear it)
  */
-function elem_css(&$elem)
-{
+function elem_css(&$elem) {
 	if (func_num_args() == 2) {
 		if (@is_array($elem['style']) && isset($elem['style'][func_get_arg(1)])) {
 			return $elem['style'][func_get_arg(1)];
@@ -199,43 +189,42 @@ function elem_css(&$elem)
  *	@param array $elem element
  *	@return string html
  */
-function elem_finalize($elem)
-{
+function elem_finalize($elem) {
 	global $single_tags;
-	
-	$ret = '<'.$elem['tag'];
+
+	$ret = '<' . $elem['tag'];
 	if (isset($elem['id'])) {
-		$ret .= ' id="'.htmlspecialchars($elem['id'], ENT_COMPAT, 'UTF-8').'"';
+		$ret .= ' id="' . htmlspecialchars($elem['id'], ENT_COMPAT, 'UTF-8') . '"';
 		unset($elem['id']);
 	}
 	if (@is_array($elem['class'])) {
-		$ret .= ' class="'.htmlspecialchars(implode(' ', $elem['class']), ENT_COMPAT, 'UTF-8').'"';
+		$ret .= ' class="' . htmlspecialchars(implode(' ', $elem['class']), ENT_COMPAT, 'UTF-8') . '"';
 		unset($elem['class']);
 	}
-	foreach ($elem as $key=>$val) {
+	foreach ($elem as $key => $val) {
 		if ($key == 'tag' || $key == 'id' || $key == 'class' || $key == 'val' || $key == 'body_inline') {
 			continue;
 		} elseif ($key == 'style') {
 			$ret .= ' style="';
 			ksort($val);
-			foreach ($val as $k=>$v) {
-				$ret .= htmlspecialchars($k, ENT_COMPAT, 'UTF-8').': '.htmlspecialchars($v, ENT_COMPAT, 'UTF-8').'; ';
+			foreach ($val as $k => $v) {
+				$ret .= htmlspecialchars($k, ENT_COMPAT, 'UTF-8') . ': ' . htmlspecialchars($v, ENT_COMPAT, 'UTF-8') . '; ';
 			}
 			// strip the last space
 			$ret = substr($ret, 0, -1);
 			$ret .= '"';
 		} else {
-			$ret .= ' '.htmlspecialchars($key, ENT_NOQUOTES, 'UTF-8').'="'.htmlspecialchars($val, ENT_COMPAT, 'UTF-8').'"';
+			$ret .= ' ' . htmlspecialchars($key, ENT_NOQUOTES, 'UTF-8') . '="' . htmlspecialchars($val, ENT_COMPAT, 'UTF-8') . '"';
 		}
 	}
 	$ret .= '>';
-	
+
 	// if the tag is body, add the container wrapper div element
-    if ($elem['tag'] == 'body') {
-        $ret .= "\n";
-        $ret .= '<div class="container">';
-    }
-	
+	if ($elem['tag'] == 'body') {
+		$ret .= "\n";
+		$ret .= '<div class="container">';
+	}
+
 	// make block elements have a newline after the opening tag
 	$block_tags = array('blockquote', 'body', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hr', 'li', 'ol', 'p', 'pre', 'script', 'ul');
 	if (in_array($elem['tag'], $block_tags)) {
@@ -244,12 +233,12 @@ function elem_finalize($elem)
 	} else {
 		$block_tag = false;
 	}
-	
+
 	// handle single-type elements
 	if (in_array(strtolower($elem['tag']), $single_tags)) {
 		return $ret;
 	}
-	
+
 	// handle text, an element array or an array of both
 	$content = '';
 	if (@is_string($elem['val'])) {
@@ -278,22 +267,22 @@ function elem_finalize($elem)
 			$content = substr($content, 0, -1);
 		}
 		$content = str_replace("\n", "\n\t", $content);
-		$ret .= tab().$content.nl();
+		$ret .= tab() . $content . nl();
 	} elseif (0 < strlen($content)) {
 		$ret .= $content;
 	}
-	
+
 	// Close the container div element if the tag is body
 	if ($elem['tag'] == 'body') {
-	    $ret .= '</div>';
+		$ret .= '</div>';
 	}
-	
-	$ret .= '</'.$elem['tag'].'>';
+
+	$ret .= '</' . $elem['tag'] . '>';
 	// make block elements have a newline after the closing tag
 	if ($block_tag) {
 		$ret .= nl();
 	}
-	
+
 	return $ret;
 }
 
@@ -305,8 +294,7 @@ function elem_finalize($elem)
  *	@param string $c class to check
  *	@return bool
  */
-function elem_has_class($elem, $c)
-{
+function elem_has_class($elem, $c) {
 	if ($elem && @in_array($c, $elem['class'])) {
 		return true;
 	} else {
@@ -321,8 +309,7 @@ function elem_has_class($elem, $c)
  *	@param array &$elem reference to an element
  *	@param string $a attribute name
  */
-function elem_remove_attr(&$elem, $a)
-{
+function elem_remove_attr(&$elem, $a) {
 	unset($elem[$a]);
 }
 
@@ -333,8 +320,7 @@ function elem_remove_attr(&$elem, $a)
  *	@param array &$elem reference to an element
  *	@param string $c class
  */
-function elem_remove_class(&$elem, $c)
-{
+function elem_remove_class(&$elem, $c) {
 	if (@is_array($elem['class'])) {
 		if (($k = array_search($c, $elem['class'])) !== false) {
 			array_splice($elem['class'], $k, 1);
@@ -350,8 +336,7 @@ function elem_remove_class(&$elem, $c)
  *	@param array $elem element
  *	@return string
  */
-function elem_tag($elem)
-{
+function elem_tag($elem) {
 	if (isset($elem['tag'])) {
 		return strtolower($elem['tag']);
 	} else {
@@ -367,8 +352,7 @@ function elem_tag($elem)
  *	@param array &$elem reference to an element
  *	@param mixed $c content (to set it, can be either a string or another element)
  */
-function elem_val(&$elem)
-{
+function elem_val(&$elem) {
 	if (func_num_args() == 1) {
 		if (@is_string($elem['val'])) {
 			return $elem['val'];
@@ -388,13 +372,12 @@ function elem_val(&$elem)
  *	@param string $url url attribute (url-encoded if necessary)
  *	@param string $title title attribute
  */
-function html_add_alternate($type, $url, $title)
-{
+function html_add_alternate($type, $url, $title) {
 	global $html;
 	if (!@is_array($html['header']['alternate'])) {
 		$html['header']['alternate'] = array();
 	}
-	$html['header']['alternate'][] = array('type'=>$type, 'url'=>$url, 'title'=>$title);
+	$html['header']['alternate'][] = array('type' => $type, 'url' => $url, 'title' => $title);
 }
 
 
@@ -405,13 +388,12 @@ function html_add_alternate($type, $url, $title)
  *	@param int $prio when to insert reference (0 - very early to 9 - late)
  *	@param string $media media attribute (optional)
  */
-function html_add_css($url, $prio = 5, $media = '')
-{
+function html_add_css($url, $prio = 5, $media = '') {
 	global $html;
 	if (!@is_array($html['header']['css'])) {
 		$html['header']['css'] = array();
 	}
-	$html['header']['css'][] = array('url'=>$url, 'prio'=>$prio, 'media'=>$media);
+	$html['header']['css'][] = array('url' => $url, 'prio' => $prio, 'media' => $media);
 }
 
 
@@ -421,13 +403,12 @@ function html_add_css($url, $prio = 5, $media = '')
  *	@param string $rule css rule
  *	@param int $prio when to insert code (0 - very early to 9 - late)
  */
-function html_add_css_inline($rule, $prio = 5)
-{
+function html_add_css_inline($rule, $prio = 5) {
 	global $html;
 	if (!@is_array($html['header']['css_inline'])) {
 		$html['header']['css_inline'] = array();
 	}
-	$html['header']['css_inline'][] = array('rule'=>$rule, 'prio'=>$prio);
+	$html['header']['css_inline'][] = array('rule' => $rule, 'prio' => $prio);
 }
 
 /**
@@ -436,13 +417,12 @@ function html_add_css_inline($rule, $prio = 5)
  *	@param string $def heade definition
  *	@param int $prio when to insert code (0 - very early to 9 - late)
  */
-function html_add_head_inline($def, $prio = 5)
-{
+function html_add_head_inline($def, $prio = 5) {
 	global $html;
 	if (!@is_array($html['header']['head_inline'])) {
 		$html['header']['head_inline'] = array();
 	}
-	$html['header']['head_inline'][] = array('def'=>$def, 'prio'=>$prio);
+	$html['header']['head_inline'][] = array('def' => $def, 'prio' => $prio);
 }
 
 /**
@@ -451,13 +431,12 @@ function html_add_head_inline($def, $prio = 5)
  *	@param string $def heade definition
  *	@param int $prio when to insert code (0 - very early to 9 - late)
  */
-function html_add_body_inline($def, $prio = 5)
-{
+function html_add_body_inline($def, $prio = 5) {
 	global $html;
 	if (!@is_array($html['body']['body_inline'])) {
 		$html['body']['body_inline'] = array();
 	}
-	$html['body']['body_inline'][] = array('def'=>$def, 'prio'=>$prio);
+	$html['body']['body_inline'][] = array('def' => $def, 'prio' => $prio);
 }
 /**
  *	add a reference to a javascript file to the html header
@@ -466,13 +445,12 @@ function html_add_body_inline($def, $prio = 5)
  *	@param string $url url attribute (url-encoded if necessary)
  *	@param int $prio when to insert reference (0 - very early to 9 - late)
  */
-function html_add_js($url, $prio = 5)
-{
+function html_add_js($url, $prio = 5) {
 	global $html;
 	if (!@is_array($html['header']['js'])) {
 		$html['header']['js'] = array();
 	}
-	$html['header']['js'][] = array('url'=>$url, 'prio'=>$prio);
+	$html['header']['js'][] = array('url' => $url, 'prio' => $prio);
 }
 
 /**
@@ -480,14 +458,14 @@ function html_add_js($url, $prio = 5)
  *
  *	duplicate references will be removed from the output.
  *	@param string $attribute attribut name, minus the "data-" prefix
-*	@param string $value value
+ *	@param string $value value
  */
 function html_add_data($attribute, $value) {
-    global $html;
-    if (!@is_array($html['header']['data'])) {
-        $html['header']['data'] = array();
-    }
-    $html['header']['data'][$attribute] = $value;
+	global $html;
+	if (!@is_array($html['header']['data'])) {
+		$html['header']['data'] = array();
+	}
+	$html['header']['data'][$attribute] = $value;
 }
 
 /**
@@ -497,13 +475,12 @@ function html_add_data($attribute, $value) {
  *	@param int $prio when to insert code (0 - very early to 9 - late)
  *	@param string $reason (e.g. your module) (optional)
  */
-function html_add_js_inline($code, $prio = 5, $reason = '')
-{
+function html_add_js_inline($code, $prio = 5, $reason = '') {
 	global $html;
 	if (!@is_array($html['header']['js_inline'])) {
 		$html['header']['js_inline'] = array();
 	}
-	$html['header']['js_inline'][] = array('code'=>$code, 'prio'=>$prio, 'reason'=>$reason);
+	$html['header']['js_inline'][] = array('code' => $code, 'prio' => $prio, 'reason' => $reason);
 }
 
 
@@ -513,8 +490,7 @@ function html_add_js_inline($code, $prio = 5, $reason = '')
  *	@param string $key variable or object the value will be stored)
  *	@param mixed $val value
  */
-function html_add_js_var($key, $val)
-{
+function html_add_js_var($key, $val) {
 	global $html;
 	if (!@is_array($html['header']['js_var'])) {
 		$html['header']['js_var'] = array();
@@ -529,8 +505,7 @@ function html_add_js_var($key, $val)
  *	@param string $prop css property name
  *	@param mixed css property value (to set it; empty string to clear it)
  */
-function html_css($prop)
-{
+function html_css($prop) {
 	global $html;
 	if (func_num_args() == 1) {
 		if (@is_array($html['header']['style']) && isset($html['header']['style'][$prop])) {
@@ -558,11 +533,10 @@ function html_css($prop)
  *	can be used for modules that need the php to be executed every time.
  *	@param string $reason (e.g. your module)
  */
-function html_disable_caching($reason = '')
-{
+function html_disable_caching($reason = '') {
 	global $html;
 	if ($html['cache']) {
-		log_msg('info', 'html: disabled caching for this request because of '.quot($reason));
+		log_msg('info', 'html: disabled caching for this request because of ' . quot($reason));
 		$html['cache'] = false;
 	}
 }
@@ -573,8 +547,7 @@ function html_disable_caching($reason = '')
  *
  *	@param string url (to set it, url-encoded if necessary)
  */
-function html_favicon()
-{
+function html_favicon() {
 	global $html;
 	if (func_num_args() == 0) {
 		if (@is_string($html['header']['favicon'])) {
@@ -595,60 +568,59 @@ function html_favicon()
  *	true before)
  *	@return string html
  */
-function html_finalize(&$cache = false)
-{
+function html_finalize(&$cache = false) {
 	global $html;
 	// return html5
-	$ret = '<!DOCTYPE html>'.nl();
+	$ret = '<!DOCTYPE html>' . nl();
 	$ret .= '<html';
 	if (@is_array($html['header']['style'])) {
 		$ret .= ' style="';
 		ksort($html['header']['style']);
-		foreach ($html['header']['style'] as $key=>$val) {
-			$ret .= htmlspecialchars($key, ENT_COMPAT, 'UTF-8').': '.htmlspecialchars($val, ENT_COMPAT, 'UTF-8').'; ';
+		foreach ($html['header']['style'] as $key => $val) {
+			$ret .= htmlspecialchars($key, ENT_COMPAT, 'UTF-8') . ': ' . htmlspecialchars($val, ENT_COMPAT, 'UTF-8') . '; ';
 		}
 		// strip the last space
 		$ret = substr($ret, 0, -1);
 		$ret .= '"';
 	}
-		
+
 	// Add data attributes if set
 	if (@is_array($html['header']['data'])) {
-	    foreach ($html['header']['data'] as $key => $val) {
-            $ret .= ' data-'.htmlspecialchars($key, ENT_COMPAT, 'UTF-8').'="'.htmlspecialchars($val, ENT_COMPAT, 'UTF-8').'"';
-        }
-    }
-	
-	$ret .= '>'.nl();
-	$ret .= '<head>'.nl();
-	$ret .= '<title>'.htmlspecialchars($html['header']['title'], ENT_NOQUOTES, 'UTF-8').'</title>'.nl();
-	$ret .= '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">'.nl();
-	$ret .= '<meta name="viewport" content="width=device-width, user-scalable=0, initial-scale=1.0">'.nl();
-	
+		foreach ($html['header']['data'] as $key => $val) {
+			$ret .= ' data-' . htmlspecialchars($key, ENT_COMPAT, 'UTF-8') . '="' . htmlspecialchars($val, ENT_COMPAT, 'UTF-8') . '"';
+		}
+	}
+
+	$ret .= '>' . nl();
+	$ret .= '<head>' . nl();
+	$ret .= '<title>' . htmlspecialchars($html['header']['title'], ENT_NOQUOTES, 'UTF-8') . '</title>' . nl();
+	$ret .= '<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">' . nl();
+	$ret .= '<meta name="viewport" content="width=device-width, user-scalable=0, initial-scale=1.0">' . nl();
+
 	if (@is_array($html['header']['alternate'])) {
 		foreach ($html['header']['alternate'] as $e) {
-			$ret .= '<link rel="alternate" type="'.htmlspecialchars($e['type'], ENT_COMPAT, 'UTF-8').'" href="'.htmlspecialchars($e['url'], ENT_COMPAT, 'UTF-8').'" title="'.htmlspecialchars($e['title'], ENT_COMPAT, 'UTF-8').'">'.nl();
+			$ret .= '<link rel="alternate" type="' . htmlspecialchars($e['type'], ENT_COMPAT, 'UTF-8') . '" href="' . htmlspecialchars($e['url'], ENT_COMPAT, 'UTF-8') . '" title="' . htmlspecialchars($e['title'], ENT_COMPAT, 'UTF-8') . '">' . nl();
 		}
 	}
 	if (!empty($html['header']['favicon'])) {
-		$ret .= '<link rel="shortcut icon" href="'.htmlspecialchars($html['header']['favicon'], ENT_COMPAT, 'UTF-8').'">'.nl();
+		$ret .= '<link rel="shortcut icon" href="' . htmlspecialchars($html['header']['favicon'], ENT_COMPAT, 'UTF-8') . '">' . nl();
 	}
 	if (@is_array($html['header']['css'])) {
 		_array_sort_by_prio($html['header']['css']);
 		// removed the removal of duplicates here as two different media might point to the same url
 		//array_unique_element($html['header']['css'], 'url');
 		foreach ($html['header']['css'] as $e) {
-			$ret .= '<link rel="stylesheet" type="text/css" href="'.htmlspecialchars($e['url'], ENT_COMPAT, 'UTF-8').'"';
+			$ret .= '<link rel="stylesheet" type="text/css" href="' . htmlspecialchars($e['url'], ENT_COMPAT, 'UTF-8') . '"';
 			if (!empty($e['media'])) {
-				$ret .= ' media="'.htmlspecialchars($e['media'], ENT_COMPAT, 'UTF-8').'"';
+				$ret .= ' media="' . htmlspecialchars($e['media'], ENT_COMPAT, 'UTF-8') . '"';
 			}
-			$ret .= '>'.nl();
+			$ret .= '>' . nl();
 		}
 	}
 	if (@is_array($html['header']['css_inline'])) {
 		_array_sort_by_prio($html['header']['css_inline']);
 		if (0 < count($html['header']['css_inline'])) {
-			$ret .= '<style type="text/css">'.nl();
+			$ret .= '<style type="text/css">' . nl();
 		}
 		foreach ($html['header']['css_inline'] as $c) {
 			$rule = $c['rule'];
@@ -658,17 +630,17 @@ function html_finalize(&$cache = false)
 			}
 			// move rule in by one tab
 			$rule = str_replace("\n", "\n\t", $rule);
-			$ret .= tab().$rule.nl();
+			$ret .= tab() . $rule . nl();
 		}
 		if (0 < count($html['header']['css_inline'])) {
-			$ret .= '</style>'.nl();
+			$ret .= '</style>' . nl();
 		}
 	}
 	if (@is_array($html['header']['js'])) {
 		_array_sort_by_prio($html['header']['js']);
 		array_unique_element($html['header']['js'], 'url');
 		foreach ($html['header']['js'] as $e) {
-			$ret .= '<script type="text/javascript" src="'.htmlspecialchars($e['url'], ENT_COMPAT, 'UTF-8').'"></script>'.nl();
+			$ret .= '<script type="text/javascript" src="' . htmlspecialchars($e['url'], ENT_COMPAT, 'UTF-8') . '"></script>' . nl();
 		}
 	}
 	if (@is_array($html['header']['js_var'])) {
@@ -678,23 +650,23 @@ function html_finalize(&$cache = false)
 		_array_sort_by_prio($html['header']['js_inline']);
 		foreach ($html['header']['js_inline'] as $c) {
 			if (!empty($c['reason'])) {
-				$ret .= '<!-- '.$c['reason'].' -->'.nl();
-				$ret .= '<script type="text/javascript">'.nl();
+				$ret .= '<!-- ' . $c['reason'] . ' -->' . nl();
+				$ret .= '<script type="text/javascript">' . nl();
 				// if the code ends with a newline character, remove it
 				if (substr($c['code'], -1) == "\n") {
 					$c['code'] = substr($c['code'], 0, -1);
 				}
 				// move code in by one tab
 				$c = str_replace("\n", "\n\t", $c);
-				$ret .= tab().$c['code'].nl();
-				$ret .= '</script>'.nl();
+				$ret .= tab() . $c['code'] . nl();
+				$ret .= '</script>' . nl();
 			}
 		}
 	}
 	if (@is_array($html['header']['head_inline'])) {
 		_array_sort_by_prio($html['header']['head_inline']);
 		if (0 < count($html['header']['head_inline'])) {
-			$ret .= '<!-- user HEAD definitions -->'.nl();
+			$ret .= '<!-- user HEAD definitions -->' . nl();
 		}
 		foreach ($html['header']['head_inline'] as $c) {
 			$def = $c['def'];
@@ -703,15 +675,15 @@ function html_finalize(&$cache = false)
 				$def = substr($def, 0, -1);
 			}
 			// $rule = str_replace("\n", "\n\t", $def);
-			$ret .= $def.nl();
+			$ret .= $def . nl();
 		}
 	}
-	$ret .= '</head>'.nl();
+	$ret .= '</head>' . nl();
 	// load user body definitions
 	if (@is_array($html['body']['body_inline'])) {
 		_array_sort_by_prio($html['body']['body_inline']);
 		if (0 < count($html['body']['body_inline'])) {
-			$user_body = '<!-- user BODY definitions -->'.nl();
+			$user_body = '<!-- user BODY definitions -->' . nl();
 		}
 		foreach ($html['body']['body_inline'] as $c) {
 			$def = $c['def'];
@@ -720,20 +692,20 @@ function html_finalize(&$cache = false)
 				$def = substr($def, 0, -1);
 			}
 			$rule = str_replace("\n", "\n\t", $def);
-			$user_body .= $def.nl();
+			$user_body .= $def . nl();
 		}
 		body_append($user_body);
 	}
 	$ret .= elem_finalize($html['body']);
 	$ret .= '</html>';
-	
+
 	// pass caching information up if requested
 	if ($cache) {
 		if (!$html['cache']) {
 			$cache = false;
 		}
 	}
-	
+
 	return $ret;
 }
 
@@ -741,12 +713,11 @@ function html_finalize(&$cache = false)
 /**
  *	reset the html output
  */
-function html_flush()
-{
+function html_flush() {
 	global $html;
 	$html = array();
-	$html['header'] = array('title'=>'');
-	$html['body'] = array('tag'=>'body');
+	$html['header'] = array('title' => '');
+	$html['body'] = array('tag' => 'body');
 	$html['cache'] = true;
 }
 
@@ -756,8 +727,7 @@ function html_flush()
  *
  *	@param string title (to set it)
  */
-function html_title()
-{
+function html_title() {
 	global $html;
 	if (func_num_args() == 0) {
 		return $html['header']['title'];

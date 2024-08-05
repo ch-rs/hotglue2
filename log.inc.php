@@ -31,12 +31,11 @@ if (!isset($request_id)) {
  *	@param string $msg message
  *	@return bool true if successful, false if not
  */
-function log_msg($level, $msg )
-{
+function log_msg($level, $msg) {
 	global $logfile;
 	global $loglevels;
 	global $request_id;
-	
+
 	// open logfile
 	if ($logfile === false) {
 		$m = umask(0111);
@@ -48,10 +47,10 @@ function log_msg($level, $msg )
 	if ($logfile === false) {
 		return false;
 	}
-	
+
 	foreach ($loglevels as $ll) {
 		if ($ll == $level) {
-			fwrite($logfile, date('Y-m-d H:i:s').tab().pad($_SERVER['REMOTE_ADDR'], 15).tab().sprintf('%05u', $request_id).tab().$level.tab().$msg.nl());
+			fwrite($logfile, date('Y-m-d H:i:s') . tab() . pad($_SERVER['REMOTE_ADDR'], 15) . tab() . sprintf('%05u', $request_id) . tab() . $level . tab() . $msg . nl());
 			fflush($logfile);
 			break;
 		}

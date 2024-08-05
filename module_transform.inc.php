@@ -20,8 +20,7 @@ require_once('modules.inc.php');
 // (they can be easier than that one though)
 
 
-function transform_alter_render_early($args)
-{
+function transform_alter_render_early($args) {
 	$elem = &$args['elem'];
 	$obj = $args['obj'];
 	if (!elem_has_class($elem, 'object')) {
@@ -36,13 +35,12 @@ function transform_alter_render_early($args)
 		elem_css($elem, '-o-transform', $all_transform);
 		elem_css($elem, '-ms-transform', $all_transform);
 	}
-	
+
 	return true;
 }
 
 
-function transform_alter_save($args)
-{
+function transform_alter_save($args) {
 	$elem = $args['elem'];
 	$obj = &$args['obj'];
 	if (!elem_has_class($elem, 'object')) {
@@ -51,8 +49,7 @@ function transform_alter_save($args)
 
 	if (elem_css($elem, '-webkit-transform') !== NULL) {
 		$obj['transform-flip'] = elem_css($elem, '-webkit-transform');
-	}	
-	else if (elem_css($elem, 'transform') !== NULL) {
+	} else if (elem_css($elem, 'transform') !== NULL) {
 		$moz_transform = elem_css($elem, 'transform');
 		$moz_transform = str_replace("px", "", $moz_transform);
 		$moz_transform = str_replace("pt", "", $moz_transform);
@@ -60,42 +57,36 @@ function transform_alter_save($args)
 	} else {
 		unset($obj['transform-flip']);
 	}
-	
+
 	return true;
 }
 
 
-function transform_render_object($args)
-{
+function transform_render_object($args) {
 	$elem = &$args['elem'];
 	$obj = &$args['obj'];
 	if (!elem_has_class($elem, 'object')) {
 		return false;
 	}
-	
+
 	if (!empty($obj['transform-flip'])) {
 		elem_css($elem, '-webkit-transform', $obj['transform-flip']);
 		elem_css($elem, '-moz-transform', $obj['transform-flip']);
 	}
-
 }
 
 
-function transform_render_page_early($args)
-{
+function transform_render_page_early($args) {
 	if ($args['edit']) {
 		if (USE_MIN_FILES) {
-			html_add_js(base_url().'modules/transform/transform.min.js');
+			html_add_js(base_url() . 'modules/transform/transform.min.js');
 		} else {
-			html_add_js(base_url().'modules/transform/transform.js');
+			html_add_js(base_url() . 'modules/transform/transform.js');
 		}
-//		html_add_css(base_url().'modules/transform/transform.css');
-//		html_add_js(base_url().'modules/transform/jquery.transform-0.9.3.min.js');
+		//		html_add_css(base_url().'modules/transform/transform.css');
+		//		html_add_js(base_url().'modules/transform/jquery.transform-0.9.3.min.js');
 		return true;
 	} else {
 		return false;
 	}
 }
-
-
-?>

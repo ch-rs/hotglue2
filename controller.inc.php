@@ -26,107 +26,105 @@ if (!isset($controllers)) {
 /**
  *	show a site where authenticated users can create new pages
  */
-function controller_create_page($args)
-{
+function controller_create_page($args) {
 	page_canonical($args[0][0]);
 	$page = $args[0][0];
 	if (page_exists($page)) {
-		log_msg('debug', 'controller_create_page: page '.quot($page).'already exists, invoking controller_edit');
+		log_msg('debug', 'controller_create_page: page ' . quot($page) . 'already exists, invoking controller_edit');
 		controller_edit($args);
 		return;
 	}
-	
+
 	load_modules('glue');
 	default_html(true);
-	html_add_css(base_url().'css/hotglue_error.css');
+	html_add_css(base_url() . 'css/hotglue_error.css');
 	if (USE_MIN_FILES) {
-		html_add_js(base_url().'js/create_page.min.js');
+		html_add_js(base_url() . 'js/create_page.min.js');
 	} else {
-		html_add_js(base_url().'js/create_page.js');
+		html_add_js(base_url() . 'js/create_page.js');
 	}
 	html_add_js_var('$.glue.page', $page);
 	html_add_js_var('$.glue.q', (SHORT_URLS ? '' : '?'));
 	$bdy = &body();
 	elem_attr($bdy, 'id', 'create_page');
-	body_append(tab(1).'<div id="paper">'.nl());
-	body_append(tab(2).'<div id="wrapper">'.nl());
-	body_append(tab(3).'<div id="content">'.nl());
-	body_append(tab(4).'<div id="left-nav">'.nl());
-	body_append(tab(5).'<img src="'.htmlspecialchars(base_url(), ENT_COMPAT, 'UTF-8').'img/hotglue-logo.png" alt="logo">'.nl());
-	body_append(tab(4).'</div>'.nl());
-	body_append(tab(4).'<div id="main">'.nl());
-	body_append(tab(5).'<h1 id="error-title">Page does not exist yet!</h1>'.nl());
-	body_append(tab(5).'<p>'.nl());
-	body_append(tab(6).'This page does not exist yet!<br>'.nl());
-	body_append(tab(6).'Would you like to create the page?'.nl());
-	body_append(tab(5).'</p>'.nl());
-	body_append(tab(5).'<form><input id="create_page_btn" type="button" value="Create it!"></form>'.nl());
-	body_append(tab(4).'</div>'.nl());
-	body_append(tab(3).'</div>'.nl());
-	body_append(tab(2).'</div>'.nl());
-	body_append(tab(2).'<div style="position: absolute; left: 200px; top: -10px; z-index: 2;">'.nl());
-	body_append(tab(3).'<img src="'.htmlspecialchars(base_url(), ENT_COMPAT, 'UTF-8').'img/hotglue-404.png" alt="404">'.nl());
-	body_append(tab(2).'</div>'.nl());
-	body_append(tab(1).'</div>'.nl());
+	body_append(tab(1) . '<div id="paper">' . nl());
+	body_append(tab(2) . '<div id="wrapper">' . nl());
+	body_append(tab(3) . '<div id="content">' . nl());
+	body_append(tab(4) . '<div id="left-nav">' . nl());
+	body_append(tab(5) . '<img src="' . htmlspecialchars(base_url(), ENT_COMPAT, 'UTF-8') . 'img/hotglue-logo.png" alt="logo">' . nl());
+	body_append(tab(4) . '</div>' . nl());
+	body_append(tab(4) . '<div id="main">' . nl());
+	body_append(tab(5) . '<h1 id="error-title">Page does not exist yet!</h1>' . nl());
+	body_append(tab(5) . '<p>' . nl());
+	body_append(tab(6) . 'This page does not exist yet!<br>' . nl());
+	body_append(tab(6) . 'Would you like to create the page?' . nl());
+	body_append(tab(5) . '</p>' . nl());
+	body_append(tab(5) . '<form><input id="create_page_btn" type="button" value="Create it!"></form>' . nl());
+	body_append(tab(4) . '</div>' . nl());
+	body_append(tab(3) . '</div>' . nl());
+	body_append(tab(2) . '</div>' . nl());
+	body_append(tab(2) . '<div style="position: absolute; left: 200px; top: -10px; z-index: 2;">' . nl());
+	body_append(tab(3) . '<img src="' . htmlspecialchars(base_url(), ENT_COMPAT, 'UTF-8') . 'img/hotglue-404.png" alt="404">' . nl());
+	body_append(tab(2) . '</div>' . nl());
+	body_append(tab(1) . '</div>' . nl());
 	echo html_finalize();
 }
 
-register_controller('*', 'create_page', 'controller_create_page', array('auth'=>true));
+register_controller('*', 'create_page', 'controller_create_page', array('auth' => true));
 
 
 /**
  *	show a site to edit pages
  */
-function controller_edit($args)
-{
+function controller_edit($args) {
 	handle_updates();
 	// this is a good spot to log the server's php version as well
-	log_msg('debug', 'controller_edit: running on php version '.phpversion());
+	log_msg('debug', 'controller_edit: running on php version ' . phpversion());
 
 	// most of these checks are only necessary if the client calls 
 	// page/edit directly
 	page_canonical($args[0][0]);
 	$page = $args[0][0];
 	if (!page_exists($page)) {
-		log_msg('debug', 'controller_edit: page '.quot($page).' does not exist, invoking controller_create_page');
+		log_msg('debug', 'controller_edit: page ' . quot($page) . ' does not exist, invoking controller_create_page');
 		controller_create_page($args);
 		return;
 	}
-	
+
 	// create page on the fly
 	load_modules('glue');
 	default_html(true);
 	html_add_js_var('$.glue.page', $page);
-	html_add_css(base_url().'css/farbtastic.css', 2);
-	html_add_css(base_url().'css/edit.css', 5);
+	html_add_css(base_url() . 'css/farbtastic.css', 2);
+	html_add_css(base_url() . 'css/edit.css', 5);
 	if (USE_MIN_FILES) {
-		html_add_js(base_url().'js/jquery-ui-1.8.6.custom.min.js', 2);
+		html_add_js(base_url() . 'js/jquery-ui-1.8.6.custom.min.js', 2);
 	} else {
-		html_add_js(base_url().'js/jquery-ui-1.8.6.custom.js', 2);
+		html_add_js(base_url() . 'js/jquery-ui-1.8.6.custom.js', 2);
 	}
 	if (USE_MIN_FILES) {
-		html_add_js(base_url().'js/farbtastic.min.js', 2);
+		html_add_js(base_url() . 'js/farbtastic.min.js', 2);
 	} else {
-		html_add_js(base_url().'js/farbtastic.js', 2);
+		html_add_js(base_url() . 'js/farbtastic.js', 2);
 	}
 	if (USE_MIN_FILES) {
-		html_add_js(base_url().'js/jquery.xcolor-1.2.1.min.js', 2);
+		html_add_js(base_url() . 'js/jquery.xcolor-1.2.1.min.js', 2);
 	} else {
-		html_add_js(base_url().'js/jquery.xcolor-1.2.1.js', 2);
+		html_add_js(base_url() . 'js/jquery.xcolor-1.2.1.js', 2);
 	}
 	if (USE_MIN_FILES) {
-		html_add_js(base_url().'js/edit.min.js', 4);
+		html_add_js(base_url() . 'js/edit.min.js', 4);
 	} else {
-		html_add_js(base_url().'js/edit.js', 4);
+		html_add_js(base_url() . 'js/edit.js', 4);
 	}
-	render_page(array('page'=>$page, 'edit'=>true));
+	render_page(array('page' => $page, 'edit' => true));
 	echo html_finalize();
-	
+
 	log_msg('debug', 'controller_edit: invoking check_auto_snapshot');
-	check_auto_snapshot(array('page'=>$page));
+	check_auto_snapshot(array('page' => $page));
 }
 
-register_controller('*', 'edit', 'controller_edit', array('auth'=>true));
+register_controller('*', 'edit', 'controller_edit', array('auth' => true));
 
 
 /**
@@ -134,8 +132,7 @@ register_controller('*', 'edit', 'controller_edit', array('auth'=>true));
  *
  *	it mainly invokes other controllers or sends error messages
  */
-function controller_default($args)
-{
+function controller_default($args) {
 	if (empty($args[0][0]) && empty($args[0][1])) {
 		// take the default page
 		$args[0][0] = startpage();
@@ -148,7 +145,7 @@ function controller_default($args)
 		invoke_controller($args);
 		return;
 	}
-	
+
 	page_canonical($args[0][0]);
 	$obj = expl('.', $args[0][0]);
 	if (count($obj) == 2) {
@@ -165,7 +162,7 @@ function controller_default($args)
 			log_msg('debug', 'controller_default: invoking controller_create_page');
 			controller_create_page($args);
 		} else {
-			log_msg('info', 'controller_default: page '.quot($args[0][0]).' not found, serving 404');
+			log_msg('info', 'controller_default: page ' . quot($args[0][0]) . ' not found, serving 404');
 			hotglue_error(404);
 		}
 	} else {
@@ -180,11 +177,11 @@ function controller_default($args)
 			}
 			log_msg('debug', 'controller_default: invoking serve_resource');
 			if (!serve_resource($args[0][0], $dl)) {
-				log_msg('info', 'controller_default: object '.quot($args[0][0]).' has no associated resource, serving 404');
+				log_msg('info', 'controller_default: object ' . quot($args[0][0]) . ' has no associated resource, serving 404');
 				hotglue_error(404);
 			}
 		} else {
-			log_msg('info', 'controller_default: object '.quot($args[0][0]).' not found, serving 404');
+			log_msg('info', 'controller_default: object ' . quot($args[0][0]) . ' not found, serving 404');
 			hotglue_error(404);
 		}
 	}
@@ -201,16 +198,15 @@ register_controller('*', '*', 'controller_default');
  *	does not seem to have an effect on the parent directory or any other sibling 
  *	directory.
  */
-function controller_login($args)
-{
+function controller_login($args) {
 	if (!is_auth()) {
 		prompt_auth();
 	} else {
 		// redirect
 		if (SHORT_URLS) {
-			header('Location: '.base_url().'pages');		
+			header('Location: ' . base_url() . 'pages');
 		} else {
-			header('Location: '.base_url().'?pages');
+			header('Location: ' . base_url() . '?pages');
 		}
 		die();
 	}
@@ -222,14 +218,13 @@ register_controller('login', '', 'controller_login');
 /**
  *	show a page
  */
-function controller_show($args)
-{
+function controller_show($args) {
 	// most of these checks are only necessary if the client calls 
 	// page/show directly
 	page_canonical($args[0][0]);
 	$page = $args[0][0];
 	if (!page_exists($page)) {
-		log_msg('info', 'controller_show: page '.quot($page).' not found, serving 404');
+		log_msg('info', 'controller_show: page ' . quot($page) . ' not found, serving 404');
 		hotglue_error(404);
 	}
 
@@ -243,16 +238,16 @@ function controller_show($args)
 		serve_cached('page', $page);
 		die();
 	}
-	
+
 	// otherwise create page on the fly
 	load_modules('glue');
 	default_html(false);
 	$cache_page = true;
-	render_page(array('page'=>$page, 'edit'=>false));
+	render_page(array('page' => $page, 'edit' => false));
 	// the $cache_page parameter is set by the html_finalize()
 	$html = html_finalize($cache_page);
 	echo $html;
-	
+
 	// and cache it
 	if (0 < CACHE_TIME && $cache_page) {
 		cache_output('page', $page, $html);
@@ -270,48 +265,47 @@ register_controller('*', 'show_page', 'controller_show');
  *	@param array $args query-arguments array
  *	@return mixed return value of controller that was called
  */
-function invoke_controller($args)
-{
+function invoke_controller($args) {
 	global $controllers;
-	
+
 	// change query-arguments so that we always have a arg0 and arg1
 	if (!isset($args[0])) {
 		$args[0] = array('', '');
 	} elseif (is_string($args[0])) {
 		$args[0] = array($args[0], '');
 	}
-	
+
 	// load all modules
 	// TODO (later): fastpath for serving cached pages or files (the latter one 
 	// is only doable when we store in the object file which module to load)
 	load_modules();
-	
+
 	$match = false;
-	if (isset($controllers[$args[0][0].'-'.$args[0][1]])) {
+	if (isset($controllers[$args[0][0] . '-' . $args[0][1]])) {
 		// foo/bar would match controller for "foo/bar"
-		$match = $controllers[$args[0][0].'-'.$args[0][1]];
-		$reason = $args[0][0].'/'.$args[0][1];
-	} elseif (isset($controllers[$args[0][0].'-*'])) {
+		$match = $controllers[$args[0][0] . '-' . $args[0][1]];
+		$reason = $args[0][0] . '/' . $args[0][1];
+	} elseif (isset($controllers[$args[0][0] . '-*'])) {
 		// foo/bar would match "foo/*"
-		$match = $controllers[$args[0][0].'-*'];
-		$reason = $args[0][0].'/*';
-	} elseif (isset($controllers['*-'.$args[0][1]])) {
+		$match = $controllers[$args[0][0] . '-*'];
+		$reason = $args[0][0] . '/*';
+	} elseif (isset($controllers['*-' . $args[0][1]])) {
 		// foo/bar would match "*/bar"
-		$match = $controllers['*-'.$args[0][1]];
-		$reason = '*/'.$args[0][1];
+		$match = $controllers['*-' . $args[0][1]];
+		$reason = '*/' . $args[0][1];
 	} elseif (isset($controllers['*-*'])) {
 		// foo/bar would match "*/*"
 		$match = $controllers['*-*'];
 		$reason = '*/*';
 	}
-	
+
 	if ($match !== false) {
 		// check authentication for those controllers that require it
 		if (isset($match['auth']) && $match['auth']) {
 			if (!is_auth()) {
 				prompt_auth();
 			}
-			
+
 			// also check the referer to prevent against cross site request 
 			// forgery (xsrf)
 			// this is not really optimal, since proxies can filter the referer 
@@ -319,18 +313,18 @@ function invoke_controller($args)
 			if (!empty($_SERVER['HTTP_REFERER'])) {
 				$bu = base_url();
 				if (substr($_SERVER['HTTP_REFERER'], 0, strlen($bu)) != $bu) {
-					log_msg('warn', 'controller: possible xsrf detected, referer is '.quot($_SERVER['HTTP_REFERER']).', arguments '.var_dump_inl($args));
+					log_msg('warn', 'controller: possible xsrf detected, referer is ' . quot($_SERVER['HTTP_REFERER']) . ', arguments ' . var_dump_inl($args));
 					hotglue_error(400);
 				}
 			}
 		}
-		
-		log_msg('info', 'controller: invoking controller '.quot($reason).' => '.$match['func']);
+
+		log_msg('info', 'controller: invoking controller ' . quot($reason) . ' => ' . $match['func']);
 		return $match['func']($args);
 	} else {
 		// normally we won't reach this as some default (*/*) controller will 
 		// be present
-		log_msg('warn', 'controller: no match for '.quot($args[0][0].'/'.$args[0][1]));
+		log_msg('warn', 'controller: no match for ' . quot($args[0][0] . '/' . $args[0][1]));
 		hotglue_error(400);
 	}
 }
@@ -341,8 +335,7 @@ function invoke_controller($args)
  *
  *	@return array query-arguments array (key/value and numeric keys)
  */
-function parse_query_string()
-{
+function parse_query_string() {
 	// QUERY_STRING per se seems not to be affected by magic quotes, only 
 	// the derived $_GET, $_POST etc
 	$q = $_SERVER['QUERY_STRING'];
@@ -357,13 +350,13 @@ function parse_query_string()
 	$temp = expl('&', $q);
 	foreach ($temp as $a) {
 		if (($p = strpos($a, '=')) !== false) {
-			$args[urldecode(substr($a, 0, $p))] = urldecode(substr($a, $p+1));
+			$args[urldecode(substr($a, 0, $p))] = urldecode(substr($a, $p + 1));
 		} else {
 			$num_args[] = urldecode($a);
 		}
 	}
 	// merge $num_args into $args
-	for ($i=0; $i < count($num_args); $i++) {
+	for ($i = 0; $i < count($num_args); $i++) {
 		// explode slashes in arguments without a key
 		if (($p = strpos($num_args[$i], '/')) !== false) {
 			$args[$i] = expl('/', $num_args[$i]);
@@ -383,11 +376,10 @@ function parse_query_string()
  *	@param string $func function name
  *	@param array $args optional arguments
  */
-function register_controller($arg0, $arg1, $func, $args = array())
-{
+function register_controller($arg0, $arg1, $func, $args = array()) {
 	global $controllers;
-	$controllers[$arg0.'-'.$arg1] = array_merge($args, array('func'=>$func));
-	log_msg('debug', 'controller: registered controller '.quot($arg0.'/'.$arg1).' => '.$func);
+	$controllers[$arg0 . '-' . $arg1] = array_merge($args, array('func' => $func));
+	log_msg('debug', 'controller: registered controller ' . quot($arg0 . '/' . $arg1) . ' => ' . $func);
 }
 
 
@@ -399,28 +391,27 @@ function register_controller($arg0, $arg1, $func, $args = array())
  *	@param bool $dl download file
  *	@return bool
  */
-function serve_resource($s, $dl)
-{
+function serve_resource($s, $dl) {
 	load_modules('glue');
-	
+
 	// resolve symlinks
-	$ret = object_get_symlink(array('name'=>$s));
+	$ret = object_get_symlink(array('name' => $s));
 	if ($ret['#error'] == false && $ret['#data'] !== false) {
-		log_msg('debug', 'controller: resolved resource '.quot($s).' into '.quot($ret['#data']));
+		log_msg('debug', 'controller: resolved resource ' . quot($s) . ' into ' . quot($ret['#data']));
 		$s = $ret['#data'];
 	}
-	
-	$obj = load_object(array('name'=>$s));
+
+	$obj = load_object(array('name' => $s));
 	if ($obj['#error']) {
 		return false;
 	} else {
 		$obj = $obj['#data'];
 	}
-	
-	$ret = invoke_hook_while('serve_resource', false, array('obj'=>$obj, 'dl'=>$dl));
+
+	$ret = invoke_hook_while('serve_resource', false, array('obj' => $obj, 'dl' => $dl));
 	// this is probably not needed as the module will most likely call 
 	// serve_file() on success, which does not return
-	foreach ($ret as $key=>$val) {
+	foreach ($ret as $key => $val) {
 		if ($val !== false) {
 			return true;
 		}

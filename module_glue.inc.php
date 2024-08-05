@@ -16,7 +16,7 @@ require_once('modules.inc.php');
 require_once('util.inc.php');
 
 
-// module_image.inc.php has more information on what's going on inside modules 
+// module_image.inc.php has more information on what's going on inside modules
 // (they can be easier than that one though)
 
 
@@ -30,8 +30,7 @@ require_once('util.inc.php');
  *	@param array $b array to compare
  *	@return int comparison result
  */
-function _cmp_time($a, $b)
-{
+function _cmp_time($a, $b) {
 	if ($a['time'] == $b['time']) {
 		return 0;
 	}
@@ -43,21 +42,21 @@ function _cmp_time($a, $b)
  *	lock an object file
  *
  *	@param string $name object name (i.e. page.rev.obj)
- *	@param mixed $wait false = give up right away, true = wait until successful, 
+ *	@param mixed $wait false = give up right away, true = wait until successful,
  *		integer values = wait up to $wait ms
- *	@return mixed true (on Win32 for now) or lock handle for success, NULL if 
+ *	@return mixed true (on Win32 for now) or lock handle for success, NULL if
  *		the object doesn't exist, and false if the lock could not be acquired
  */
-function _obj_lock($name, $wait = true)
-{
-	// TODO (later): make this work on Windows (opening and writing to files 
+
+function _obj_lock($name, $wait = true) {
+	// TODO (later): make this work on Windows (opening and writing to files
 	// after taking the lock doesn't work there atm)
 	// bandaid below
 	if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
 		log_msg('warn', 'lock: locking is not supported on WIN32 at the moment');
 		return true;
 	}
-	
+
 	$start = intval(microtime(true)*1000.0);
 	$fn = CONTENT_DIR.'/'.str_replace('.', '/', $name);
 	// resolve symlinks
@@ -102,14 +101,13 @@ function _obj_lock($name, $wait = true)
  *
  *	@param mixed $f lock handle (or anything on Win32)
  */
-function _obj_unlock($f)
-{
+function _obj_unlock($f) {
 	// bandaid below
 	if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
 		log_msg('warn', 'unlock: locking is not supported on WIN32 at the moment');
 		return;
 	}
-	
+
 	if ($f) {
 		@flock($f, LOCK_UN);
 		log_msg('debug', 'lock: released lock');
@@ -136,11 +134,11 @@ function check_auto_snapshot($args)
 	if (!page_exists($args['page'])) {
 		return response('Page '.quot($args['page']).' does not exist', 400);
 	}
-	
+
 	$a = expl('.', $args['page']);
 	$revs = revisions_info(array('pagename'=>$a[0], 'sort'=>'time'));
 	$revs = $revs['#data'];
-	
+
 	if ($a[1] == 'head' && SNAPSHOT_MIN_AGE != 0) {
 		// we're dealing with a head revision and taking snapshots
 		// find the previous auto- revision
@@ -165,7 +163,7 @@ function check_auto_snapshot($args)
 			}
 		}
 	}
-	
+
 	// delete old auto- revisions
 	if (SNAPSHOT_MAX_AGE != 0) {
 		for ($i=count($revs)-1; 0 <= $i; $i--) {
@@ -176,7 +174,7 @@ function check_auto_snapshot($args)
 			}
 		}
 	}
-	
+
 	return response(true);
 }
 
@@ -200,7 +198,7 @@ function clone_object($args)
 	} else {
 		$old = $old['#data'];
 	}
-	
+
 	// create new object
 	$a = expl('.', $old['name']);
 	$new = create_object(array('page'=>$a[0].'.'.$a[1]));
@@ -209,7 +207,7 @@ function clone_object($args)
 	} else {
 		$new = $new['#data'];
 	}
-	
+
 	// save old object as new
 	$new = array_merge($old, $new);
 	$ret = save_object($new);
@@ -240,7 +238,7 @@ function create_object($args)
 	if (!page_exists($args['page'])) {
 		return response('Page '.quot($args['page']).' does not exist', 400);
 	}
-	
+
 	// try to create new file
 	$f = false;
 	$tries = 0;
@@ -253,7 +251,7 @@ function create_object($args)
 		umask($m);
 	}
 	while ($f === false && $tries++ < 9);
-	
+
 	if (!$f) {
 		return response('Error creating an object in page '.quot($args['page']), 500);
 	} else {
@@ -282,10 +280,10 @@ function create_page($args)
 		return response('Page '.quot($args['page']).' already exists', 400);
 	}
 	if (!valid_pagename($args['page'])) {
-		return response('Invalid page name '.quot($args['page']), 400);	
+		return response('Invalid page name '.quot($args['page']), 400);
 	}
-	
-	$a = expl('.', $args['page']);	
+
+	$a = expl('.', $args['page']);
 	$d = CONTENT_DIR.'/'.$a[0];
 	if (!is_dir($d)) {
 		$m = umask(0000);
@@ -295,7 +293,7 @@ function create_page($args)
 		}
 		umask($m);
 	}
-	
+
 	$d .= '/'.$a[1];
 	if (!is_dir($d)) {
 		$m = umask(0000);
@@ -331,14 +329,14 @@ function delete_object($args)
 		return response('Object '.quot($args['name']).' does not exist', 404);
 	}
 	// check if the object file is writable
-	// this allows us to make singular objects read-only by setting the file 
+	// this allows us to make singular objects read-only by setting the file
 	// permissions to 0444 or similar
 	if (!is_writable(CONTENT_DIR.'/'.str_replace('.', '/', $args['name']))) {
 		return response('Object '.quot($args['name']).' is read-only, not deleting it', 500);
 	}
-	
+
 	// call delete_object unless the object is a symlink
-	// this is because referenced resources are not part of the current page 
+	// this is because referenced resources are not part of the current page
 	// anyway, and this way it is easier to handle for the modules
 	$ret = object_get_symlink($args);
 	$ret = $ret['#data'];
@@ -351,12 +349,12 @@ function delete_object($args)
 		}
 		invoke_hook('delete_object', array('obj'=>$obj));
 	}
-	
+
 	if (!@unlink(CONTENT_DIR.'/'.str_replace('.', '/', $args['name']))) {
 		return response('Error deleting object '.quot($args['name']), 500);
 	} else {
 		log_msg('info', 'delete_object: deleted '.quot($args['name']));
-		// drop the all pages from the cache (since the object could have been 
+		// drop the all pages from the cache (since the object could have been
 		// symlinked)
 		drop_cache('page');
 		return response(true);
@@ -382,11 +380,11 @@ function delete_page($args)
 	if (!page_exists($args['page'])) {
 		return response('Page '.quot($args['page']).' does not exist', 404);
 	}
-	
+
 	log_msg('info', 'delete_page: deleting '.quot($args['page']));
 	invoke_hook('delete_page', array('page'=>$args['page']));
-	
-	// TODO (later): make it possible to delete all revisions at once 
+
+	// TODO (later): make it possible to delete all revisions at once
 	// (optimization for frontend)
 	// TODO (later): how to deal with .svn and .git subdirectories?
 	// it's objects first
@@ -413,7 +411,7 @@ function delete_page($args)
 			}
 		}
 	}
-	
+
 	// then the revision directory
 	if (!@rmdir(CONTENT_DIR.'/'.str_replace('.', '/', $args['page']))) {
 		return response('Error deleting page '.$args['page'], 500);
@@ -422,14 +420,14 @@ function delete_page($args)
 		// drop the page from cache
 		drop_cache('page', $args['page']);
 	}
-	
+
 	// finally try the shared directory and page directory
 	$a = expl('.', $args['page']);
 	@rmdir(CONTENT_DIR.'/'.$a[0].'/shared');
 	if (@rmdir(CONTENT_DIR.'/'.$a[0])) {
 		log_msg('info', 'delete_page: parent page directory empty, removing '.quot($a[0]));
 	}
-	
+
 	return response(true);
 }
 
@@ -441,8 +439,8 @@ register_hook('has_reference', 'used for deleting referenced resources');
 /**
  *	delete a file in the shared directory of a page
  *
- *	this function only deletes the file when there are no references to it 
- *	left. this is not meant to be called directly from the frontend, but 
+ *	this function only deletes the file when there are no references to it
+ *	left. this is not meant to be called directly from the frontend, but
  *	modules should use it when implementing delete_object.
  *	@param array $args arguments
  *		key 'pagename' is the pagename (i.e. page)
@@ -458,14 +456,14 @@ function delete_upload($args)
 	} else {
 		$max_cnt = 0;
 	}
-	
+
 	$refs = upload_references(array_merge($args, array('stop_after'=>$max_cnt+1)));
 	if ($refs['#error']) {
 		return $refs;
 	} else {
 		$refs = $refs['#data'];
 	}
-	
+
 	$f = CONTENT_DIR.'/'.$args['pagename'].'/shared/'.$args['file'];
 	if (count($refs) <= $max_cnt) {
 		if (@unlink($f)) {
@@ -517,17 +515,17 @@ function load_object($args)
 	if (empty($args['name'])) {
 		return response('Required argument "name" missing or empty', 400);
 	}
-	
+
 	// open file for reading
 	if (($f = @fopen(CONTENT_DIR.'/'.str_replace('.', '/', $args['name']), 'rb')) === false) {
 		return response('Error opening '.quot($args['name']).' for reading', 404);
 	}
-	
+
 	// set the name attribute
 	// TODO (later): declaring arrays like this is probably unnecessary
 	$ret = array();
 	$ret['name'] = $args['name'];
-	
+
 	// read lines and fill object array
 	$doing_attribs = true;
 	while (!feof($f)) {
@@ -559,10 +557,10 @@ function load_object($args)
 		}
 	}
 	fclose($f);
-	
+
 	// re-set the name attribute (in case it got overwritten)
 	$ret['name'] = $args['name'];
-	
+
 	return response($ret);
 }
 
@@ -575,8 +573,8 @@ register_service('glue.load_object', 'load_object', array('auth'=>true));
  *	@param array $args arguments
  *		key 'name' is the object name (i.e. page.rev.obj)
  *	@return array response
- *		key '#data' either has the target as object name, an 
- *		empty string if the target is outside the content directory or 
+ *		key '#data' either has the target as object name, an
+ *		empty string if the target is outside the content directory or
  *		false if the object is no symlink
  */
 function object_get_symlink($args)
@@ -584,7 +582,7 @@ function object_get_symlink($args)
 	if (empty($args['name'])) {
 		return response('Required argument "name" missing or empty', 400);
 	}
-	
+
 	// TODO (later): think the symlink situation on Windows through
 	if (is_link(CONTENT_DIR.'/'.str_replace('.', '/', $args['name']))) {
 		$f = readlink(CONTENT_DIR.'/'.str_replace('.', '/', $args['name']));
@@ -632,7 +630,7 @@ function object_make_symlink($args)
 		$target = '../../'.str_replace('.', '/', $args['name']);
 		$skip_pns = array($a[0]);
 	}
-	
+
 	$pns = pagenames(array());
 	$pns = $pns['#data'];
 	// for every pagename
@@ -645,7 +643,7 @@ function object_make_symlink($args)
 			$link = CONTENT_DIR.'/'.$pn.'/head/'.$a[2];
 			if (is_file($link) && !is_link($link)) {
 				// delete objects with the same name
-				// these should have been created when shapshotting and the 
+				// these should have been created when shapshotting and the
 				// revision has later been reverted to
 				delete_object(array('name'=>$pn.'.head.'.$a[2]));
 			} elseif (is_link($link) && !is_file($link) && !is_dir($link)) {
@@ -656,7 +654,7 @@ function object_make_symlink($args)
 					log_msg('error', 'object_make_symlink: error deleting dangling symlink '.quot($pn.'.head.'.$a[2]));
 				}
 			}
-					
+
 			// try to create symlink
 			if (@symlink($target, $link)) {
 				log_msg('debug', 'object_make_symlink: '.quot($pn.'.head.'.$a[2]).' -> '.quot($target));
@@ -665,7 +663,7 @@ function object_make_symlink($args)
 			}
 		}
 	}
-	
+
 	return response(true);
 }
 
@@ -678,7 +676,7 @@ register_service('glue.object_make_symlink', 'object_make_symlink', array('auth'
  *	this function takes the object lock.
  *	@param array $args arguments
  *		key 'name' is the object name (i.e. page.rev.obj)
- *		key 'attr' is either a string or an array containing the attribute 
+ *		key 'attr' is either a string or an array containing the attribute
  *			names (keys) to remove
  *	@return array response
  */
@@ -687,7 +685,7 @@ function object_remove_attr($args)
 	if (!isset($args['attr'])) {
 		return response('Required argument "attr" missing', 400);
 	}
-	
+
 	// LOCK
 	// TODO (later): $args['name'] might not be set
 	$_l = _obj_lock($args['name'], LOCK_TIME);
@@ -702,7 +700,7 @@ function object_remove_attr($args)
 	} else {
 		$obj = $obj['#data'];
 	}
-	
+
 	if (is_array($args['attr'])) {
 		foreach ($args['attr'] as $a) {
 			if (isset($obj[$a])) {
@@ -718,7 +716,7 @@ function object_remove_attr($args)
 		_obj_unlock($_l);
 		return response('Argument "attr" need to be either array or string', 400);
 	}
-	
+
 	$ret = save_object($obj);
 	// UNLOCK
 	_obj_unlock($_l);
@@ -764,7 +762,7 @@ register_service('glue.pagenames', 'pagenames');
 /**
  *	turn an object into an html string
  *
- *	the function also appends the resulting string to the output in 
+ *	the function also appends the resulting string to the output in
  *	html.inc.php.
  *	@param array $args arguments
  *		string 'name' is the object name (i.e. page.rev.obj)
@@ -774,7 +772,7 @@ register_service('glue.pagenames', 'pagenames');
  */
 function render_object($args)
 {
-	// maybe move this to common.inc.php in the future and get rid of some of 
+	// maybe move this to common.inc.php in the future and get rid of some of
 	// these checks in the beginning
 	$obj = load_object($args);
 	if ($obj['#error']) {
@@ -793,7 +791,7 @@ function render_object($args)
 	if (!isset($args['build'])) {
 		$args['build'] = false;
 	}
-	
+
 	log_msg('debug', 'render_object: rendering '.quot($args['name']));
 	$ret = invoke_hook_while('render_object', false, array('obj'=>$obj, 'edit'=>$args['edit'], 'build'=>$args['build']));
 	if (empty($ret)) {
@@ -820,7 +818,7 @@ register_hook('render_object', 'render an object');
 /**
  *	turn a page into an html string
  *
- *	the function also appends the resulting string to the output in 
+ *	the function also appends the resulting string to the output in
  *	html.inc.php.
  *	@param array $args arguments
  *		key 'page' is the page (i.e. page.rev)
@@ -830,7 +828,7 @@ register_hook('render_object', 'render an object');
  */
 function render_page($args)
 {
-	// maybe move this to common.inc.php in the future and get rid of some of 
+	// maybe move this to common.inc.php in the future and get rid of some of
 	// these checks in the beginning
 	if (empty($args['page'])) {
 		return response('Required argument "page" missing or empty', 400);
@@ -849,13 +847,13 @@ function render_page($args)
 	} else {
 		$args['edit'] = false;
 	}
-	
+
 	log_msg('debug', 'render_page: rendering '.quot($args['page']));
 	$bdy = &body();
 	elem_add_class($bdy, 'page');
 	elem_attr($bdy, 'id', $args['page']);
 	invoke_hook('render_page_early', array('page'=>$args['page'], 'edit'=>$args['edit'], 'build'=>$args['build']));
-	
+
 	// for every file in the page directory
 	$files = @scandir(CONTENT_DIR.'/'.str_replace('.', '/', $args['page']));
 	foreach ($files as $f) {
@@ -874,10 +872,10 @@ function render_page($args)
 		// render object
 		render_object(array('name'=>$args['page'].'.'.$f, 'edit'=>$args['edit'], 'build'=>$args['build']));
 	}
-	
+
 	invoke_hook('render_page_late', array('page'=>$args['page'], 'edit'=>$args['edit'], 'build'=>$args['build']));
 	log_msg('debug', 'render_page: finished '.quot($args['page']));
-	
+
 	// return the body element as html-string as well
 	return response(elem_finalize($bdy));
 }
@@ -913,9 +911,9 @@ function rename_page($args)
 	if (!valid_pagename($args['new'].'.head')) {
 		return response('Invalid page name '.quot($args['new']), 400);
 	}
-	
+
 	if (!@rename(CONTENT_DIR.'/'.$args['old'], CONTENT_DIR.'/'.$args['new'])) {
-		return response('Error renaming page '.quot($args['old']).' to '.quot($args['new']), 500);	
+		return response('Error renaming page '.quot($args['old']).' to '.quot($args['new']), 500);
 	} else {
 		log_msg('info', 'rename_page: renamed '.quot($args['old']).' to '.quot($args['new']));
 		// clean up cache as well
@@ -935,7 +933,7 @@ register_hook('rename_page', 'invoked when a page has been renamed');
 
 /**
  *	copy a page
- *	original page revisions are left out 
+ *	original page revisions are left out
  *	@param array $args arguments
  *		key 'old' old page (i.e. page1.rev)
  *		key 'new' new page (i.e. page2.rev)
@@ -1021,9 +1019,9 @@ function revert($args)
 	if ($a[1] == 'head') {
 		return response('Cannot revert to head revision', 400);
 	}
-	
+
 	log_msg('info', 'revert: reverting to '.quot($args['page']));
-	
+
 	// delete current head revision
 	// TODO (later): create a snapshot of it before doing so?
 	if (page_exists($a[0].'.head')) {
@@ -1032,7 +1030,7 @@ function revert($args)
 			return $ret;
 		}
 	}
-	
+
 	// create new head revision
 	$dest = CONTENT_DIR.'/'.$a[0].'/head';
 	$m = umask(0000);
@@ -1041,7 +1039,7 @@ function revert($args)
 		return response('Error creating directory '.quot($dest), 500);
 	}
 	umask($m);
-	
+
 	// copy files
 	$src = CONTENT_DIR.'/'.$a[0].'/'.$a[1];
 	$files = scandir($src);
@@ -1057,10 +1055,10 @@ function revert($args)
 			umask($m);
 		}
 	}
-	
+
 	log_msg('info', 'revert: reverted to '.quot($args['page']));
 	invoke_hook('revert', array('page'=>$args['page']));
-	
+
 	return response(true);
 }
 
@@ -1083,7 +1081,7 @@ function revisions($args)
 	if (!is_dir(CONTENT_DIR.'/'.$args['pagename'])) {
 		return response('Page name '.quot($args['pagename']).' does not exist', 404);
 	}
-	
+
 	$files = @scandir(CONTENT_DIR.'/'.$args['pagename']);
 	$ret = array();
 	foreach ($files as $f) {
@@ -1110,7 +1108,7 @@ register_service('glue.revisions', 'revisions');
  *
  *	@param array $args arguments
  *		key 'pagename' is the pagename (i.e. page)
- *		key 'sort' can be either 'time' (descending) or 'name' (ascending, the 
+ *		key 'sort' can be either 'time' (descending) or 'name' (ascending, the
  *		default)
  *	@return array response
  */
@@ -1120,13 +1118,13 @@ function revisions_info($args)
 	if ($revs['#error']) {
 		return $revs;
 	}
-	
+
 	$ret = array();
 	foreach ($revs['#data'] as $r) {
 		$d = CONTENT_DIR.'/'.$args['pagename'].'/'.$r;
 		$ret[] = array('revision'=>$r, 'time'=>@filemtime($d), 'num_objs'=>count(@scandir($d))-2, 'page'=>$args['pagename'].'.'.$r);
 	}
-	
+
 	if (isset($args['sort']) && $args['sort'] == 'time') {
 		// make head revision always most recent one
 		$head = false;
@@ -1142,7 +1140,7 @@ function revisions_info($args)
 			$ret = array_merge(array($head), $ret);
 		}
 	}
-	
+
 	return response($ret);
 }
 
@@ -1152,7 +1150,7 @@ register_service('glue.revisions_info', 'revisions_info');
 /**
  *	save an object to the content directory
  *
- *	use update_object() whenever possible as we want to preserve any object 
+ *	use update_object() whenever possible as we want to preserve any object
  *	metadata that is stored in as attributes.
  *	@param array $args arguments
  *		key 'name' is the object name (i.e. page.rev.obj)
@@ -1165,7 +1163,7 @@ function save_object($args)
 	if (empty($args['name'])) {
 		return response('Required argument "name" missing or empty', 400);
 	}
-	
+
 	// open file for writing
 	$m = umask(0111);
 	if (($f = @fopen(CONTENT_DIR.'/'.str_replace('.', '/', $args['name']), 'wb')) === false) {
@@ -1173,7 +1171,7 @@ function save_object($args)
 		return response('Error opening '.quot($args['name']).' for writing', 500);
 	}
 	umask($m);
-	
+
 	// save attributes
 	foreach ($args as $key=>$val) {
 		if ($key == 'name' || $key == 'content') {
@@ -1190,17 +1188,17 @@ function save_object($args)
 		$val = str_replace("\r", '', $val);
 		fwrite($f, $key.':'.$val."\n");
 	}
-	
+
 	// save content
 	if (isset($args['content'])) {
 		fwrite($f, "\n");
 		fwrite($f, $args['content']);
 	}
-	
+
 	fclose($f);
 	// drop all pages from cache (since the object could be symlinked)
 	drop_cache('page');
-	
+
 	return response(true);
 }
 
@@ -1221,17 +1219,17 @@ function save_state($args)
 	if (empty($args['html'])) {
 		return response('Required argument "html" missing or empty', 400);
 	}
-	
+
 	require_once('html.inc.php');
 	require_once('html_parse.inc.php');
-	
+
 	$elem = html_parse_elem($args['html']);
 	if (!elem_has_class($elem, 'object')) {
 		return response('Error saving state as class "object" is not set', 400);
 	} elseif (!object_exists(elem_attr($elem, 'id'))) {
 		return response('Error saving state as object does not exist', 404);
 	}
-	
+
 	// LOCK
 	$L = _obj_lock(elem_attr($elem, 'id'), LOCK_TIME);
 	if ($L === false) {
@@ -1258,8 +1256,8 @@ function save_state($args)
 }
 
 register_service('glue.save_state', 'save_state', array('auth'=>true));
-// modules handling this hook need to make sure that they are not calling 
-// either update_object() or object_remove_attr(), but rather save_object() 
+// modules handling this hook need to make sure that they are not calling
+// either update_object() or object_remove_attr(), but rather save_object()
 // directly
 register_hook('save_state', 'save the current state of an object to disk');
 
@@ -1277,7 +1275,7 @@ function set_startpage($args)
 	if (!isset($args['page'])) {
 		return response('Required argument "page" missing', 400);
 	}
-	
+
 	$m = umask(0111);
 	if (@file_put_contents(CONTENT_DIR.'/startpage', $args['page']) === false) {
 		umask($m);
@@ -1296,10 +1294,10 @@ register_service('glue.set_startpage', 'set_startpage', array('auth'=>true));
  *
  *	@param array $args arguments
  *		key 'page' page to shapshot (i.e. page.rev)
- *		key 'rev' (optional) new revision name (i.e. rev2) (if empty or not set 
- *			a revision starting with 'auto-' and the current date will be 
+ *		key 'rev' (optional) new revision name (i.e. rev2) (if empty or not set
+ *			a revision starting with 'auto-' and the current date will be
  *			created)
- *	@return array response (holding the page of the newly created revision 
+ *	@return array response (holding the page of the newly created revision
  *		if successful)
  */
 function snapshot($args)
@@ -1319,7 +1317,7 @@ function snapshot($args)
 	} elseif (!valid_pagename($a[0].'.'.$args['rev'])) {
 		return response('Invalid revision '.quot($args['rev']), 400);
 	}
-	
+
 	// create revision
 	$dest = CONTENT_DIR.'/'.$a[0].'/'.$args['rev'];
 	$m = umask(0000);
@@ -1328,7 +1326,7 @@ function snapshot($args)
 		return response('Error creating directory '.quot($dest), 500);
 	}
 	umask($m);
-	
+
 	// copy files
 	// we go through the files one by one in order to spot symlinks hiding
 	$src = CONTENT_DIR.'/'.str_replace('.', '/', $args['page']);
@@ -1351,7 +1349,7 @@ function snapshot($args)
 				log_msg('debug', 'snapshot: copied the content of symlink '.quot($args['page'].'.'.$f));
 			}
 			umask($m);
-			// load the newly created snapshot and give modules a chance to 
+			// load the newly created snapshot and give modules a chance to
 			// copy referenced files as well
 			$dest_name = $a[0].'.'.$args['rev'].'.'.$f;
 			$dest_obj = load_object(array('name'=>$dest_name));
@@ -1379,7 +1377,7 @@ function snapshot($args)
 			umask($m);
 		}
 	}
-	
+
 	log_msg('info', 'snapshot: created snapshot '.quot($a[0].'.'.$args['rev']).' from '.quot($args['page']));
 	return response($a[0].'.'.$args['rev']);
 }
@@ -1391,7 +1389,7 @@ register_hook('snapshot_symlink', 'invoked when a symlink is part of a page that
 /**
  *	update an object
  *
- *	this function merges the attributes in $args with the object already on 
+ *	this function merges the attributes in $args with the object already on
  *	disk. the object need not exist before, though.
  *	this function takes the object lock.
  *	@param array $args arguments
@@ -1405,10 +1403,10 @@ function update_object($args)
 	if (empty($args['name'])) {
 		return response('Required argument "name" missing or empty', 400);
 	}
-	
+
 	// LOCK
 	$L = _obj_lock($args['name'], LOCK_TIME);
-	// the object need not exist, so we're not checking against 
+	// the object need not exist, so we're not checking against
 	// $L being NULL here
 	if ($L === false) {
 		return response('Could not acquire lock to '.quot($args['name']).' in '.LOCK_TIME.'ms', 500);
@@ -1420,7 +1418,7 @@ function update_object($args)
 		$old = $old['#data'];
 	}
 	$new = array_merge($old, $args);
-	
+
 	$ret = save_object($new);
 	// UNLOCK
 	_obj_unlock($L);
@@ -1435,7 +1433,7 @@ register_service('glue.update_object', 'update_object', array('auth'=>true));
  *
  *	@param array $args arguments
  *		key 'page' page to upload the files to (i.e. page.rev)
- *		key 'preferred_module' (optional) try first to invoke the upload method 
+ *		key 'preferred_module' (optional) try first to invoke the upload method
  *			on this module
  *	@return array response
  *		array of rendered, newly created objects
@@ -1448,9 +1446,9 @@ function upload_files($args)
 	if (!page_exists($args['page'])) {
 		return response('Page '.quot($args['page']).' does not exist', 404);
 	}
-	
+
 	$ret = array();
-	
+
 	log_msg('debug', 'upload_files: $_FILES is '.var_dump_inl($_FILES));
 	foreach ($_FILES as $f) {
 		$existed = false;
@@ -1494,7 +1492,7 @@ function upload_files($args)
 				log_msg('info', 'upload_object: '.quot($fn).' was (fallback-) handled by '.quot(array_pop(array_keys($r))));
 			}
 		}
-		
+
 		if ($s === false) {
 			log_msg('warn', 'upload_files: nobody cared about file '.quot($fn).', type '.$f['type']);
 			// delete file again unless it did already exist
@@ -1506,7 +1504,7 @@ function upload_files($args)
 			$ret[] = $s;
 		}
 	}
-	
+
 	return response($ret);
 }
 
@@ -1540,9 +1538,9 @@ function upload_references($args)
 	} else {
 		$stop_after = 0;
 	}
-	
+
 	$ret = array();
-	
+
 	// for each revision
 	foreach ($revs as $rev) {
 		// load all objects
@@ -1569,7 +1567,7 @@ function upload_references($args)
 			}
 		}
 	}
-	
+
 	return response($ret);
 }
 
