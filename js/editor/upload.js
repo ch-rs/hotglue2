@@ -326,18 +326,18 @@ $.glue.upload = function () {
                         $(obj).data('orig_visibility', $(obj).css('visibility'));
                         $(obj).css('visibility', 'hidden');
                         // add to dom
-                        $('body').append(obj);
+                        $(containerSelector).append(obj);
                         // DEBUG
                         //console.log('glue-upload-dynamic-early: '+$(obj).attr('id'));
                         // fire handler
                         $(obj).trigger('glue-upload-dynamic-early', [mode, target_x, target_y]);
                     } else {
                         // add to dom
-                        $('body').append(obj);
+                        $(containerSelector).append(obj);
                         // position object
                         if (mode == 'center') {
                             // move to the center of mouseclick
-                            $(obj).css('left', (target_x - $(obj).outerWidth() / 2) + 'px');
+                            $(obj).css('left', (target_x - $(containerSelector).offset().left - $(obj).outerWidth() / 2) + 'px');
                             $(obj).css('top', (target_y - $(obj).outerHeight() / 2) + 'px');
                         } else {
                             // move to stack

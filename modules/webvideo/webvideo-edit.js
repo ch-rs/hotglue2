@@ -70,7 +70,7 @@ $(document).ready(function () {
 				// put the iframe behind some shield for editing
 				child = $('<div class="glue-webvideo-handle glue-ui" title="drag here"></div>');
 				$(elem).append(child);
-				$('body').append(elem);
+				$(containerSelector).append(elem);
 				// make width and height explicit
 				$(elem).css('width', $(elem).width() + 'px');
 				$(elem).css('height', $(elem).height() + 'px');

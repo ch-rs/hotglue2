@@ -161,6 +161,7 @@ $.glue.contextmenu = function () {
             // position items
             for (var i = 0; i < 2; i++) {
                 var target;
+                // Get the current position of the object relative to the document
                 var cur_left = $(obj).offset().left;
                 var cur_top = $(obj).offset().top;
                 var offset = 48; // menu offset (when can't calculate height or width)

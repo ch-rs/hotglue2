@@ -272,12 +272,12 @@ $(document).ready(function () {
 				var rand = Math.floor(Math.random() * $.glue.conf.object.default_colors.length);
 				$(elem).css('background-color', $.glue.conf.object.default_colors[rand]);
 			}
-			$('body').append(elem);
+			$(containerSelector).append(elem);
 			// make width and height explicit
 			$(elem).css('width', $(elem).width() + 'px');
 			$(elem).css('height', $(elem).height() + 'px');
 			// move to mouseclick
-			$(elem).css('left', (e.pageX - $(elem).outerWidth() / 2) + 'px');
+			$(elem).css('left', (e.pageX - $(containerSelector).offset().left - $(elem).outerWidth() / 2) + 'px');
 			$(elem).css('top', (e.pageY - $(elem).outerHeight() / 2) + 'px');
 			$.glue.object.register(elem);
 			$.glue.object.save(elem);
@@ -296,9 +296,15 @@ $(document).ready(function () {
 		var col = $(obj).css('background-color');
 		if (e.shiftKey) {
 			col = prompt('Enter background color (e.g. #ff0000 or rgb(255, 0, 0))', col);
+
+			$(obj).css('background-color', col);
+			// explicitly set the color for the textarea as changes to the parent object are not reflected while editing on Chrome 10.0.634.0 and below)
+			$(obj).children('.glue-text-input').css('background-color', col);
+
 			if (!col) {
 				return;
 			}
+			return;
 		}
 		$.glue.colorpicker.show(col, false, function (col) {
 			$(obj).css('background-color', col);

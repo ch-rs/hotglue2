@@ -19,3 +19,7 @@ a:hover {
 	color: inherit;
 	text-decoration: inherit;
 }
+
+div p:only-child {
+	margin: 0;
+}

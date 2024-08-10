@@ -14,7 +14,7 @@ $(document).ready(function () {
         }
 
         $(elem).attr('src', $.glue.base_url + 'modules/page_status/page_status-icon-' + modes[currentMode] + '.png');
-    });
+    }, false);
 
     $(elem).bind('mousedown', function (e) {
         var that = this;

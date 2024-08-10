@@ -22,10 +22,10 @@ $(document).ready(function () {
 			// set new id
 			$(clone).attr('id', data);
 			// move object a bit
-			$(clone).css('left', ($(obj).position().left + $.glue.grid.x()) + 'px');
-			$(clone).css('top', ($(obj).position().top + $.glue.grid.y()) + 'px');
+			$(clone).css('left', ($(obj).position().left + 60) + 'px');
+			$(clone).css('top', ($(obj).position().top + 60 + 'px'));
 			// add to dom and register
-			$('body').append(clone);
+			$(containerSelector).append(clone);
 			$(clone).trigger('glue-pre-clone');
 			$.glue.object.register(clone);
 			// select new object

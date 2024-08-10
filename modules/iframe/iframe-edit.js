@@ -31,12 +31,12 @@ $(document).ready(function () {
 			// put the iframe behind some shield for editing
 			child = $('<div class="glue-iframe-shield glue-ui" style="height: 100%; position: absolute; width: 100%;" title="visitors will be able to interact with the webpage below"></div>');
 			$(elem).append(child);
-			$('body').append(elem);
+			$(containerSelector).append(elem);
 			// make width and height explicit
 			$(elem).css('width', $(elem).width() + 'px');
 			$(elem).css('height', $(elem).height() + 'px');
 			// move to mouseclick
-			$(elem).css('left', (e.pageX - $(elem).outerWidth() / 2) + 'px');
+			$(elem).css('left', (e.pageX - $(containerSelector).offset().left - $(elem).outerWidth() / 2) + 'px');
 			$(elem).css('top', (e.pageY - $(elem).outerHeight() / 2) + 'px');
 			$.glue.object.register(elem);
 			$.glue.object.save(elem);

@@ -17,3 +17,5 @@ import './editor/sel.js';
 import './editor/slider.js';
 import './editor/stack.js';
 import './editor/upload.js';
+
+window.containerSelector = 'body:not(:has(.container)),.container';
