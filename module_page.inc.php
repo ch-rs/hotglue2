@@ -79,7 +79,7 @@ function page_delete_page($args) {
 
 function page_has_reference($args) {
 	$obj = $args['obj'];
-	if (array_pop(expl('.', $obj['name'])) != 'page') {
+	if (@array_pop(expl('.', $obj['name'])) != 'page') {
 		return false;
 	}
 

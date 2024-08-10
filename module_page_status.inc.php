@@ -50,21 +50,25 @@ function controller_permission_check($args) {
 
         // If pagefile exists
         if (object_exists($pagefile)) {
-            $obj = load_object(["name" => $pagefile]);
+            $obj = @load_object(["name" => $pagefile]);
+
+            if (!isset($obj)) {
+                return controller_default($args);
+            }
 
             if (@isset($obj['#data']) && @isset($obj['#data']['page-status'])) {
                 if ($obj['#data']['page-status'] == 'live') {
-                    controller_default($args);
+                    return controller_default($args);
                 }
             }
         } else {
-            controller_default($args);
+            return controller_default($args);
         }
     } else {
-        controller_default($args);
+        return controller_default($args);
     }
 
-    hotglue_error(404);
+    return hotglue_error(404);
 }
 
 register_controller('*', '*', 'controller_permission_check');
