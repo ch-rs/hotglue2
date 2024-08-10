@@ -6,3 +6,5 @@ node_modules
 log.txt
 .htaccess
 user-config.inc.php
+/vendor
+templates_c

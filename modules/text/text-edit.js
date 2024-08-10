@@ -153,7 +153,11 @@ $.glue.text = function () {
 			$(elem).children('.glue-text-input').text($(elem).children('.glue-text-input').val());
 			// update the content on the server
 			// see the comments in $.glue.object.register_alter_pre_save below
-			$.glue.backend({ method: 'glue.update_object', name: $(elem).attr('id'), 'content': $(elem).children('.glue-text-input').val() });
+			$.glue.backend({ method: 'glue.update_object', name: $(elem).attr('id'), 'content': $(elem).children('.glue-text-input').val() }, function (data) {
+				if (data && data.rendered) {
+					$(elem).children('.glue-text-render').html(data.rendered);
+				}
+			});
 		}
 	};
 }();

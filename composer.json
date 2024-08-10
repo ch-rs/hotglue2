@@ -1,0 +1,9 @@
+{
+    "name": "chris/hotglue2",
+    "description": "My Hotglue fork",
+    "type": "project",
+    "require": {
+        "michelf/php-markdown": "^2.0",
+        "smarty/smarty": "^5.3"
+    }
+}

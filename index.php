@@ -9,12 +9,13 @@
  *	See the file COPYING for more details.
  */
 
+require 'vendor/autoload.php';
+
 @require_once('config.inc.php');
 require_once('log.inc.php');
 log_msg('info', '--- request ---');
 require_once('controller.inc.php');
 require_once('modules.inc.php');
-
 
 $args = parse_query_string();
 log_msg('info', 'index: query arguments ' . var_dump_inl($args));

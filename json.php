@@ -8,6 +8,7 @@
  *	This source code is licensed under the GNU General Public License.
  *	See the file COPYING for more details.
  */
+require 'vendor/autoload.php';
 
 @require_once('config.inc.php');
 require_once('log.inc.php');

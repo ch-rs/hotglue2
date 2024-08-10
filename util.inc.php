@@ -286,7 +286,11 @@ function http_error($code, $header_only = false) {
 			// unsupported
 			return false;
 	}
-	header($_SERVER['SERVER_PROTOCOL'] . ' ' . $code . ' ' . $error);
+
+	if (!headers_sent()) {
+		header($_SERVER['SERVER_PROTOCOL'] . ' ' . $code . ' ' . $error);
+	}
+
 	if (!$header_only) {
 		echo $error;
 		die();
