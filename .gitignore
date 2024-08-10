@@ -8,3 +8,4 @@ log.txt
 user-config.inc.php
 /vendor
 templates_c
+loaders/*.php
