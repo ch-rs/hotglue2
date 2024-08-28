@@ -445,7 +445,7 @@ function page_short($s) {
  *	this function does not return.
  */
 function prompt_auth($header_only = false) {
-	if (AUTH_METHOD == 'none') {
+	if (AUTH_METHOD == 'none' || PHP_SAPI === 'cli') {
 		// nothing to do here
 	} elseif (AUTH_METHOD == 'basic') {
 		header('WWW-Authenticate: Basic realm="' . str_replace("\"", '', SITE_NAME) . '"');

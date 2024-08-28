@@ -108,6 +108,24 @@ function copy_page_assets($page_name) {
 	copy_folders($dirs);
 }
 
+function is_draft($page) {
+	$pagefile = $page . '.head.page';
+	if (page_exists($pagefile)) {
+		$obj = @load_object(["name" => $pagefile]);
+
+		if (!isset($obj)) {
+			return true;
+		}
+
+		if (@isset($obj['#data']) && @isset($obj['#data']['page-status'])) {
+			if ($obj['#data']['page-status'] == 'live') {
+				return false;
+			}
+		}
+	}
+
+	return true;
+}
 
 function controller_builder($args) {
 	if ($args[0][1] == 'build_all') {
@@ -115,6 +133,11 @@ function controller_builder($args) {
 		$pns = pagenames(array());
 		$pns = $pns['#data'];
 		foreach ($pns as $pn) {
+			// If page is a draft, continue
+			if (is_draft($pn)) {
+				continue;
+			}
+
 			$page_html = get_single_page_html($pn);
 			write_single_page($pn, $page_html);
 			copy_page_assets($pn);
@@ -123,10 +146,20 @@ function controller_builder($args) {
 	} else {
 		$page_name = $args[0][0];
 
+		// If page is a draft, throw 404
+		if (is_draft($page_name)) {
+			return response('Page not found', 404);
+		}
+
 		$page_html = get_single_page_html($page_name);
 		write_single_page($page_name, $page_html);
 		copy_page_assets($page_name);
 		copy_global_assets();
+	}
+
+	// If script is being run via CLI, exit
+	if (PHP_SAPI === 'cli') {
+		return;
 	}
 
 	// If referrer exists, redirect back to it, otherwise redirect to $page

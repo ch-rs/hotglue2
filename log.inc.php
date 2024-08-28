@@ -50,7 +50,7 @@ function log_msg($level, $msg) {
 
 	foreach ($loglevels as $ll) {
 		if ($ll == $level) {
-			fwrite($logfile, date('Y-m-d H:i:s') . tab() . pad($_SERVER['REMOTE_ADDR'], 15) . tab() . sprintf('%05u', $request_id) . tab() . $level . tab() . $msg . nl());
+			fwrite($logfile, date('Y-m-d H:i:s') . tab() . pad(isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : 'CLI', 15) . tab() . sprintf('%05u', $request_id) . tab() . $level . tab() . $msg . nl());
 			fflush($logfile);
 			break;
 		}

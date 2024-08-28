@@ -98,6 +98,11 @@ function base_url() {
 	if (!empty($temp)) {
 		return $temp;
 	}
+
+	if (PHP_SAPI === 'cli') {
+		return 'http://localhost';
+	}
+
 	if (isset($base_url_cached)) {
 		return $base_url_cached;
 	} elseif (!isset($base_url_cached)) {
