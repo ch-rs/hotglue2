@@ -33,7 +33,7 @@ $(document).ready(function () {
 
 	// Drag to set container width
 	elem = $('<img src="' + $.glue.base_url + 'modules/responsive/page-container-size.png" width="32" height="32">');
-	$(elem).attr('title', 'change responsive mode (' + (parseInt(document.documentElement.style.getPropertyValue('--container-width')) || 'unset') + ')');
+	$(elem).attr('title', 'drag to change safe area width (' + (parseInt(document.documentElement.style.getPropertyValue('--container-width')) || 'unset') + ')');
 	$(elem).bind('mousedown', function (e) {
 		var that = this;
 		let initialWidth = parseInt(document.documentElement.style.getPropertyValue('--container-width')) || 500;

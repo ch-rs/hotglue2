@@ -2,6 +2,11 @@
     outline: 1px dashed rgba(0, 0, 0, 0.2);
 }
 
+html[data-responsive-mode="fluid-container"],
+html[data-responsive-mode="fluid-left-container"] {
+    overflow-x: hidden;
+}
+
 html[data-responsive-mode="fluid-tiles"] body:before {
     content: '';
     position: absolute;
