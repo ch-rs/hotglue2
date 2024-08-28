@@ -1,10 +1,22 @@
-Hotglue 1.0.4
+Hotglue 1.1.0
 
-developed by Gottfried Haider and Danja Vasiliev
+created by Gottfried Haider and Danja Vasiliev
 and the people from WORM (worm.org)
 with support from the Mondriaan Foundation
 made for you
 
+SIGNIFICANT CHANGES THIS FORK
+
+  * Add module_responsive to provide safe areas for mobile viewports (in page menu)
+  * Add a static site generator, module_build (`/build` path and `/build_all` path to trigger build)
+  * Add a module_page_status for setting page status (live, draft), pages are now draft by default
+  * Add module_markdown to format Markdown inside text blocks
+  * Add module_loaders, to provide each page with an optional PHP script for injecting dynamic data (Make file in `/loaders/[page_name].php`, load up $data array and access in text nodes with {$data.key})
+  * Add more font options thanks to [Modern Font Stacks](https://modernfontstacks.com/)
+
+Extra steps:
+
+  * If you want to use module_markdown or module_loaders, you need to install dependencies with [Composer](https://getcomposer.org/). Otherwise, you can disable these by renaming their files.
 
 HOW DOES THIS WORK
 

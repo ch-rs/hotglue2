@@ -3,113 +3,115 @@
  *	Functions for handling uploads
 */
 
+
+$(document).ready(function () {
+    // generic upload button
+    var elem = $('<div style="height: 32px; max-height: 32px; max-width: 32px; overflow: hidden; width: 32px;"><img src="' + $.glue.base_url + 'img/upload.png" alt="btn" width="32" height="32"></div>');
+    var upload = $.glue.upload.default_upload_handling();
+    upload.multiple = true;
+
+    if (!$.glue.page) {
+        $.glue.error('No page set, cannot upload files');
+        return;
+    }
+
+    $.glue.upload.button(elem, { method: 'glue.upload_files', page: $.glue.page }, upload);
+
+    if (!$.glue.menu) {
+        $(elem).bind('click', function (e) {
+            // update x, y  
+            var p = $.glue.menu.spawn_coords();
+            upload.x = p.x;
+            upload.y = p.y;
+        });
+        $.glue.menu.register('new', elem, 11);
+    }
+
+    // handle drop events on body
+    // this is based on http://developer.mozilla.org/en/using_files_from_web_applications
+    // does not seem to be possible in jQuery at the moment
+    // we use html here as body doesn't get enlarged when zooming out e.g.
+    $('html').get(0).addEventListener('dragover', function (e) {
+        e.stopPropagation();
+        e.preventDefault();
+    }, false);
+
+    $('html').get(0).addEventListener('drop', function (e) {
+        e.stopPropagation();
+        e.preventDefault();
+        // pageX, pageY are available in Firefox and Chrome
+        // TODO (later): pageX, pageY does not seem to handle zoomed pages in Chrome (report)
+        var upload = $.glue.upload.default_upload_handling(e.pageX, e.pageY);
+        $.glue.upload.files(e.dataTransfer.files, { method: 'glue.upload_files', page: $.glue.page }, upload);
+    }, false);
+});
+
 $.glue.upload = function () {
     // helper function that provides a default upload
     // orig_x .. (page) x position of upload (can be set on the fly in .x)
     // orig_y .. (page) y position of upload (can be set on the fly in .y)
     // TODO (later): expose this through $.glue.upload.default_upload_handling
-    var default_upload_handling = function (orig_x, orig_y) {
-        if (orig_x === undefined) {
-            orig_x = 0;
-        }
-        if (orig_y === undefined) {
-            orig_y = 0;
-        }
-        var uploading = 0;
-        return {
-            error: function (e) {
-                // remove status indicator if no file uploading anymore
-                uploading--;
-                if (uploading == 0) {
-                    $(this.status).detach();
-                }
-                // e.target.status suggested in
-                // http://developer.mozilla.org/en/XMLHttpRequest/Using_XMLHttpRequest
-                if (e && e.target && e.target.status) {
-                    $.glue.error('There was a problem uploading a file (status ' + e.target.status + ')');
-                } else {
-                    $.glue.error('There was a problem uploading a file. Make sure you are not exceeding the file size limits set in the server configuration.');
-                    // DEBUG
-                    console.error(e);
-                }
-            },
-            finish: function (data) {
-                // DEBUG
-                //console.log('finished uploading');
-                // remove status indicator if no file uploading anymore
-                uploading--;
-                if (uploading == 0) {
-                    // DEBUG
-                    //console.log('no files uploading anymore, removing status indicator');
-                    $(this.status).detach();
-                }
-                // handle response
-                $.glue.upload.handle_response(data, this.x, this.y);
-            },
-            progress: function (e) {
-                // update status indicator
-                // TODO (later): values are off on Chrome when uploading multiple file, one after another (it jumps back and forth) (report)
-                $(this.status).children('.glue-upload-statusbar-done').css('width', (e.loaded / e.total * 100) + '%');
-                $(this.status).attr('title', e.loaded + ' of ' + e.total + ' bytes (' + (e.loaded / e.total * 100).toFixed(1) + '%)');
-            },
-            start: function (e) {
-                // DEBUG
-                //console.log('started uploading');
-                $.glue.menu && $.glue.menu.hide();
-                uploading++;
-                // add status indicator to dom
-                $('body').append(this.status);
-                $(this.status).children('.glue-upload-statusbar-done').css('width', '0%');
-                $(this.status).css('left', (this.x - $(this.status).outerWidth() / 2) + 'px');
-                $(this.status).css('top', (this.y - $(this.status).outerHeight() / 2) + 'px');
-            },
-            status: $('<div class="glue-upload-statusbar glue-ui" style="position: absolute; z-index: 202;"><div class="glue-upload-statusbar-done"></div></div>'),
-            x: orig_x,
-            y: orig_y
-        }
-    };
-
-    $(document).ready(function () {
-        // generic upload button
-        var elem = $('<div style="height: 32px; max-height: 32px; max-width: 32px; overflow: hidden; width: 32px;"><img src="' + $.glue.base_url + 'img/upload.png" alt="btn" width="32" height="32"></div>');
-        var upload = default_upload_handling();
-        upload.multiple = true;
-
-        if (!$.glue.page) {
-            $.glue.error('No page set, cannot upload files');
-            return;
-        }
-
-        $.glue.upload.button(elem, { method: 'glue.upload_files', page: $.glue.page }, upload);
-        if (!$.glue.menu) {
-            $(elem).bind('click', function (e) {
-                // update x, y  
-                var p = $.glue.menu.spawn_coords();
-                upload.x = p.x;
-                upload.y = p.y;
-            });
-            $.glue.menu.register('new', elem, 11);
-        }
-
-        // handle drop events on body
-        // this is based on http://developer.mozilla.org/en/using_files_from_web_applications
-        // does not seem to be possible in jQuery at the moment
-        // we use html here as body doesn't get enlarged when zooming out e.g.
-        $('html').get(0).addEventListener('dragover', function (e) {
-            e.stopPropagation();
-            e.preventDefault();
-        }, false);
-        $('html').get(0).addEventListener('drop', function (e) {
-            e.stopPropagation();
-            e.preventDefault();
-            // pageX, pageY are available in Firefox and Chrome
-            // TODO (later): pageX, pageY does not seem to handle zoomed pages in Chrome (report)
-            var upload = default_upload_handling(e.pageX, e.pageY);
-            $.glue.upload.files(e.dataTransfer.files, { method: 'glue.upload_files', page: $.glue.page }, upload);
-        }, false);
-    });
-
     return {
+        default_upload_handling: function (orig_x, orig_y) {
+            if (orig_x === undefined) {
+                orig_x = 0;
+            }
+            if (orig_y === undefined) {
+                orig_y = 0;
+            }
+            var uploading = 0;
+            return {
+                error: function (e) {
+                    // remove status indicator if no file uploading anymore
+                    uploading--;
+                    if (uploading == 0) {
+                        $(this.status).detach();
+                    }
+                    // e.target.status suggested in
+                    // http://developer.mozilla.org/en/XMLHttpRequest/Using_XMLHttpRequest
+                    if (e && e.target && e.target.status) {
+                        $.glue.error('There was a problem uploading a file (status ' + e.target.status + ')');
+                    } else {
+                        $.glue.error('There was a problem uploading a file. Make sure you are not exceeding the file size limits set in the server configuration.');
+                        // DEBUG
+                        console.error(e);
+                    }
+                },
+                finish: function (data) {
+                    // DEBUG
+                    //console.log('finished uploading');
+                    // remove status indicator if no file uploading anymore
+                    uploading--;
+                    if (uploading == 0) {
+                        // DEBUG
+                        //console.log('no files uploading anymore, removing status indicator');
+                        $(this.status).detach();
+                    }
+                    // handle response
+                    $.glue.upload.handle_response(data, this.x, this.y);
+                },
+                progress: function (e) {
+                    // update status indicator
+                    // TODO (later): values are off on Chrome when uploading multiple file, one after another (it jumps back and forth) (report)
+                    $(this.status).children('.glue-upload-statusbar-done').css('width', (e.loaded / e.total * 100) + '%');
+                    $(this.status).attr('title', e.loaded + ' of ' + e.total + ' bytes (' + (e.loaded / e.total * 100).toFixed(1) + '%)');
+                },
+                start: function (e) {
+                    // DEBUG
+                    //console.log('started uploading');
+                    $.glue.menu && $.glue.menu.hide();
+                    uploading++;
+                    // add status indicator to dom
+                    $('body').append(this.status);
+                    $(this.status).children('.glue-upload-statusbar-done').css('width', '0%');
+                    $(this.status).css('left', (this.x - $(this.status).outerWidth() / 2) + 'px');
+                    $(this.status).css('top', (this.y - $(this.status).outerHeight() / 2) + 'px');
+                },
+                status: $('<div class="glue-upload-statusbar glue-ui" style="position: absolute; z-index: 202;"><div class="glue-upload-statusbar-done"></div></div>'),
+                x: orig_x,
+                y: orig_y
+            }
+        },
         // elem .. element to turn into a file button
         // data .. other parameters to send to the service
         // options ..	multiple => allow multiple files to be uploaded (boolean, defaults to false)

@@ -7,5 +7,5 @@ log.txt
 .htaccess
 user-config.inc.php
 /vendor
-templates_c
+/templates_c
 loaders/*.php

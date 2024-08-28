@@ -57,8 +57,37 @@ function controller_permission_check($args) {
             }
 
             if (@isset($obj['#data']) && @isset($obj['#data']['page-status'])) {
+
+                // Only show live pages
                 if ($obj['#data']['page-status'] == 'live') {
                     return controller_default($args);
+                }
+
+                if ($obj['#data']['page-status'] == 'protected') {
+
+                    // Return 401 if page has no password
+                    if (!isset($obj['#data']['page-password'])) {
+                        return hotglue_error(401);
+                    }
+
+                    // Ask for password with HTTP auth, if not already authenticated, and show the page if correct
+                    if (!isset($_SERVER['PHP_AUTH_USER'])) {
+                        header('WWW-Authenticate: Basic realm="Password required"');
+                        header('HTTP/1.0 401 Unauthorized');
+                        echo 'You need to enter the correct password to view this page.';
+                        exit;
+                    } else {
+                        $user = isset($obj['#data']['page-user']) ? $obj['#data']['page-user'] : 'guest';
+                        $password = $obj['#data']['page-password'];
+                        if ($_SERVER['PHP_AUTH_USER'] == $user && $_SERVER['PHP_AUTH_PW'] == $password) {
+                            return controller_default($args);
+                        } else {
+                            header('WWW-Authenticate: Basic realm="Password required"');
+                            header('HTTP/1.0 401 Unauthorized');
+                            echo 'You need to enter the correct password to view this page.';
+                            exit;
+                        }
+                    }
                 }
             }
         } else {

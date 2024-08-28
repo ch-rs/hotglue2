@@ -3,15 +3,28 @@ $(document).ready(function () {
     $(elem).attr('title', 'change page status');
 
     var currentMode
-    var modes = ['live', 'draft'];
+    var modes = ['live', 'draft', 'protected'];
+
+    function showHidePasswordIcon() {
+        if (passwordElem) {
+            if (currentMode == 2) {
+                passwordElem.show();
+            }
+            else {
+                passwordElem.hide();
+            }
+        }
+    }
 
     $.glue.backend({ method: 'glue.load_object', name: $.glue.page + '.page' }, function (data) {
-        if (!data['page-status']) {
+        if (!data['#data'] && !data['#data']['page-status']) {
             currentMode = 1
         }
         else {
-            currentMode = modes.indexOf(data['page-status']);
+            currentMode = modes.indexOf(data['#data']['page-status']);
         }
+
+        showHidePasswordIcon();
 
         $(elem).attr('src', $.glue.base_url + 'modules/page_status/page_status-icon-' + modes[currentMode] + '.png');
     }, false);
@@ -26,9 +39,24 @@ $(document).ready(function () {
         $.glue.backend({ method: 'glue.update_object', name: $.glue.page + '.page', 'page-status': modes[nextMode] });
         currentMode = nextMode;
 
+        showHidePasswordIcon();
+
         $(that).attr('title', 'change page status (currently ' + modes[nextMode] + ')');
         $.glue.menu.hide();
     });
 
     $.glue.menu.register('page', elem, 0);
+
+    var passwordElem = $('<img src="' + $.glue.base_url + 'modules/page_status/page_status-icon-set-password.png" class="password-icon" width="32" height="32">');
+    $(passwordElem).attr('title', 'set page password');
+    $(passwordElem).bind('mousedown', function (e) {
+        // Prompt for new password
+        var password = prompt('Enter new password for this page');
+        if (password) {
+            $.glue.backend({ method: 'glue.update_object', name: $.glue.page + '.page', 'page-password': password });
+            alert('New password has been set for this page.');
+        }
+    });
+
+    $.glue.menu.register('page', passwordElem, 1);
 });
