@@ -19,6 +19,12 @@ $pages = [];
 function loaders_alter_render_early($object) {
     global $pages;
 
+    // If Smarty is not installed, return
+    if (!class_exists('Smarty\Smarty')) {
+        log_msg('debug', 'Smarty is not installed, not converting text');
+        return $object;
+    }
+
     $page = explode('.', $object['obj']['name'])[0];
 
     $smarty = new Smarty();

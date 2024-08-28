@@ -66,6 +66,8 @@ error_reporting(E_ALL & ~E_STRICT);						// see php documentation
 @define('STATIC_DIR', 'static'); // directory for built HTML website with module_build.inc.php
 @define('STATIC_UPLOAD_DIR', '/uploads'); // directory for static file uploads inside STATIC_DIR
 
+@define('USE_INTERNAL_MINIFIER', false);
+
 // viewing pages requires authentication
 
 /**

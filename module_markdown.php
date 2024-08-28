@@ -18,6 +18,12 @@ $pages = [];
 
 function markdown_alter_render_early($object) {
 
+    // If Markdown is not installed, return
+    if (!class_exists('Michelf\Markdown')) {
+        log_msg('debug', 'Michelf Markdown is not installed, not converting text');
+        return $object;
+    }
+
     $object['elem'] = markdown_text_nodes($object['elem']);
 
     return $object;
