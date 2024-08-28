@@ -7,12 +7,12 @@ made for you
 
 SIGNIFICANT CHANGES THIS FORK
 
-  * Add module_responsive to provide safe areas for mobile viewports (in page menu)
-  * Add a static site generator, module_build (`/build` path and `/build_all` path to trigger build)
-  * Add a module_page_status for setting page status (live, draft, protected), pages are now draft by default
-  * Add module_markdown to format Markdown inside text blocks
-  * Add module_loaders, to provide each page with an optional PHP script for injecting dynamic data (Make file in `/loaders/[page_name].php`, load up $data array and access in text nodes with {$data.key})
-  * Removed minified JS files from the source, and added optional module_minify for generating those at runtime if source JS files were changed. Can be disabled in favour of a local tool.
+  * Add **module_responsive** to provide safe areas for mobile viewports (in page menu)
+  * Add a static site generator, **module_build** (`/build` path and `/build_all` path to trigger build)
+  * Add **module_page_status** for setting page status (live, draft, protected), pages are now draft by default
+  * Add **module_markdown** to format Markdown inside text blocks
+  * Add **module_loaders**, to provide each page with an optional PHP script for injecting dynamic data (Make file in `/loaders/[page_name].php`, load up $data array and access in text nodes with {$data.key})
+  * Removed minified JS files from the source, and added optional **module_minify** for generating those at runtime if source JS files were changed. Can be disabled in favour of a local tool.
   * Add more font options thanks to [Modern Font Stacks](https://modernfontstacks.com/)
 
 Extra steps:
