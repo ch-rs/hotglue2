@@ -38,6 +38,15 @@ RewriteRule ^(.*)$ index.php?$1
   Require all denied
 </Files>
 
+# Deny access to all files and dirs in the content folder, except for those inside "shared"
+<Directory "content">
+  Require all denied
+</Directory>
+
+<DirectoryMatch "content/.*/shared">
+  Require all granted
+</DirectoryMatch>
+
 # Apache 2.2
 #<Files COPYING>
 #	order deny,allow
@@ -51,3 +60,7 @@ RewriteRule ^(.*)$ index.php?$1
 #	order deny,allow
 #	deny from all
 #</Files>
+#<Directory content>
+#	order deny,allow
+#	deny from all
+#</Directory>
