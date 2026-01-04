@@ -235,25 +235,31 @@ $('.text').live('glue-deselect', function (e) {
 });
 
 $('.text.glue-selected').live('click', function (e) {
-	// check if we are already editing
-	if ($(this).hasClass('glue-text-editing')) {
-		return;
-	}
-	// deselect all other objects
-	if ($(this).hasClass('glue-selected')) {
-		$('.glue-selected').not(this).each(function () {
-			$.glue.sel.deselect(this);
-		});
-	}
-	// make the textarea visible
-	$(this).children('.glue-text-input').css('display', 'block');
-	$(this).children('.glue-text-render').css('display', 'none');
-	$(this).addClass('glue-text-editing');
-	// set focus and selection
-	$(this).children('.glue-text-input').focus();
-	if ($(this).children('.glue-text-input').get(0).setSelectionRange) {
-		$(this).children('.glue-text-input').get(0).setSelectionRange(0, 0);
-	}
+    // check if we are already editing
+    if ($(this).hasClass('glue-text-editing')) {
+        return;
+    }
+    // deselect all other objects
+    if ($(this).hasClass('glue-selected')) {
+        $('.glue-selected').not(this).each(function () {
+            $.glue.sel.deselect(this);
+        });
+    }
+    
+    // Get the original content from the textarea (which was set by PHP)
+    var originalContent = $(this).children('.glue-text-input').text();
+    
+    // make the textarea visible and set its value to the original content
+    $(this).children('.glue-text-input').val(originalContent);
+    $(this).children('.glue-text-input').css('display', 'block');
+    $(this).children('.glue-text-render').css('display', 'none');
+    $(this).addClass('glue-text-editing');
+    
+    // set focus and selection
+    $(this).children('.glue-text-input').focus();
+    if ($(this).children('.glue-text-input').get(0).setSelectionRange) {
+        $(this).children('.glue-text-input').get(0).setSelectionRange(0, 0);
+    }
 });
 
 $(document).ready(function () {

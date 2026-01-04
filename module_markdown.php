@@ -17,6 +17,10 @@ require_once('modules.inc.php');
 $pages = [];
 
 function markdown_alter_render_early($object) {
+    // Don't convert markdown in edit mode
+    if (isset($object['edit']) && $object['edit']) {
+        return $object;
+    }
 
     // If Markdown is not installed, return
     if (!class_exists('Michelf\Markdown')) {
@@ -25,7 +29,6 @@ function markdown_alter_render_early($object) {
     }
 
     $object['elem'] = markdown_text_nodes($object['elem']);
-
     return $object;
 }
 
@@ -41,12 +44,12 @@ function markdown_text_nodes($elem) {
             $elem['val'][$key] = markdown_text_nodes($val);
         }
     } else if (isset($elem['val']) && is_string($elem['val'])) {
-        // If elem is a string, render it with Smarty
+        // If elem is a string, render it with Markdown
         // Only if val contains a newline character
-        if (strpos($elem['val'], "\n") > 1) {
+        //if (strpos($elem['val'], "\n") > 1) {
             $elem['val'] = Markdown::defaultTransform($elem['val']);
             $elem['class'][] = 'markdown';
-        }
+        //}
     }
 
     return $elem;

@@ -1163,10 +1163,15 @@ function save_object($args) {
 			log_msg('warn', 'save_object: skipping attribute ' . quot($key) . ' in object ' . quot($args['name']));
 			continue;
 		}
+
+		/*
 		// filter newlines from value
 		$val = str_replace("\r\n", '', $val);
 		$val = str_replace("\n", '', $val);
 		$val = str_replace("\r", '', $val);
+		*/
+
+		// filter newlines from value
 		fwrite($f, $key . ':' . $val . "\n");
 	}
 
